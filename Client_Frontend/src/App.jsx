@@ -16,6 +16,9 @@ import BlogPage from './Pages/BlogPage';
 import BlogDetailsPage from './Pages/BlogDetailsPage';
 import TrustedPartners from './Pages/TrustedPartners';
 import WorkshopsAndSeminarsPage from './Pages/WorkshopsAndSeminarsPage';
+import VerifyEmail from './Pages/VerifyEmail';
+import EmailCheck from './Pages/EmailCheck';
+import ResetPassword from './Pages/ResetPassword';
 
 function App() {
   return (
@@ -32,6 +35,9 @@ function App() {
             <Route path="/jobs/:jobId" element={<JobDetails />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
+            <Route path='/verifyEmail' element={<VerifyEmail/>} />
+            <Route path='/emailCheck' element={<EmailCheck/>} />
+            <Route path='/resetPassword' element={<ResetPassword/>} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/application" element={<Application />} />

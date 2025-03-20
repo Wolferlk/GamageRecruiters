@@ -8,6 +8,7 @@ const session = require('express-session');
 
 const { dbconnect } = require('./config/dbConnection');
 const userRoute = require('./Routers/userRoute');
+const adminRoute = require('./Routers/adminRoute');
 const googleAuthRoute = require('./Routers/googleAuthRoute');
 const facebookAuthRoute = require('./Routers/facebookAuthRoute');
 const linkedInAuthRoute = require('./Routers/LinkedInAuthRoute');
@@ -50,7 +51,8 @@ app.use(passport.session());
 
 const contactRouter = require('./Routers/contactRouter');
 app.use("/api/contact",contactRouter);
-app.use('/', userRoute);
+app.use('/user', userRoute);
+app.use('/admin', adminRoute)
 app.use('/', googleAuthRoute);
 app.use('/', facebookAuthRoute);
 app.use('/', linkedInAuthRoute)
