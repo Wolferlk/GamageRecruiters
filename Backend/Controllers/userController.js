@@ -1,6 +1,62 @@
 const bcrypt = require('bcryptjs');
 const { pool } = require('../config/dbConnection');
 
+async function uploadUserImage (req, res) {
+    console.log(req.body);
+    const { id } = req.body;
+    console.log(id);
+    if(!id) {
+        return res.status(400).send('Image Upload Failed');
+    }
+
+    try {
+        const imageName = req.files?.photo?.[0]?.filename || null;
+        console.log(imageName);
+
+        if(imageName) {
+            const updateImageQuery = 'UPDATE users SET photo = ? WHERE userId = ?';
+            pool.query(updateImageQuery, [imageName, id], (error, result) => {
+                if(error) {
+                    return res.status(400).send('Image Upload Failed');
+                } 
+
+                return res.status(200).json({ message: 'Image Uploaded Successfully', data: result, image: imageName });
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send(error);
+    }
+}
+
+async function uploadUserCV (req, res) {
+    console.log(req.body);
+    const { id } = req.body;
+    console.log(id);
+    if(!id) {
+        return res.status(400).send('Image Upload Failed');
+    }
+
+    try {
+        const cvName = req.files?.cv?.[0]?.filename || null;
+        console.log(cvName);
+
+        if(cvName) {
+            const updateImageQuery = 'UPDATE users SET cv = ? WHERE userId = ?';
+            pool.query(updateImageQuery, [cvName, id], (error, result) => {
+                if(error) {
+                    return res.status(400).send('Image Upload Failed');
+                } 
+
+                return res.status(200).json({ message: 'Image Uploaded Successfully', data: result, cv: cvName });
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send(error);
+    }
+}
+
 async function updateUserDetails (req, res) {
     const { userId, firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, photo, cv, linkedInLink, facebookLink, portfolioLink, profileDescription } = req.body; 
 
@@ -150,4 +206,4 @@ async function changePassword (req, res) {
     }
 }
 
-module.exports = { deleteUser, changePassword, updateUserDetails }
+module.exports = { deleteUser, changePassword, updateUserDetails, uploadUserImage, uploadUserCV }

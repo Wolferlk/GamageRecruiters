@@ -43,6 +43,8 @@ export default function SignupPage() {
   const [photo, setPhoto] = useState(null);
   const [profileDescription, setProfileDescription] = useState('');
   const [loadVerifyOTP, setLoadVerifyOTP] = useState(false);
+  const [cvName, setCVName] = useState('');
+  const [photoName, setPhotoName] = useState('');
 
   const emailValue = 'dummy@gmail.com';
 
@@ -149,11 +151,13 @@ export default function SignupPage() {
   const handleCVChange = (e) => {
     console.log(e.target.files[0]);
     setCV(e.target.files[0]);
+    setCVName(e.target.files[0].name);
   };
 
   const handlePhotoChange = (e) => {
     console.log(e.target.files[0]);
     setPhoto(e.target.files[0]);
+    setPhotoName(e.target.files[0].name);
   };
 
   const handleInputChange = (e) => {
@@ -596,9 +600,15 @@ export default function SignupPage() {
                       />
                       <label htmlFor="cv-upload" className="cursor-pointer">
                         <FaFileUpload className="mx-auto text-gray-400 text-3xl mb-2" />
-                        <p className="text-sm text-gray-500">
-                          Drag and drop your CV here, or <span className="text-blue-600 font-medium">browse</span>
-                        </p>
+                        { cv ? (
+                          <p className="text-sm text-gray-500">
+                            {cvName}
+                          </p>
+                        ): (
+                          <p className="text-sm text-gray-500">
+                            Drag and drop your CV here, or <span className="text-blue-600 font-medium">browse</span>
+                          </p>
+                        )}
                         <p className="text-xs text-gray-400 mt-1">PDF format only</p>
                       </label>
                     </div>
@@ -619,9 +629,15 @@ export default function SignupPage() {
                       />
                       <label htmlFor="photo-upload" className="cursor-pointer">
                         <FaPortrait className="mx-auto text-gray-400 text-3xl mb-2" />
-                        <p className="text-sm text-gray-500">
-                          Drag and drop your photo here, or <span className="text-blue-600 font-medium">browse</span>
-                        </p>
+                        { photo ? (
+                          <p className="text-sm text-gray-500">
+                            {photoName}
+                          </p>
+                        ): (
+                          <p className="text-sm text-gray-500">
+                            Drag and drop your photo here, or <span className="text-blue-600 font-medium">browse</span>
+                          </p>
+                        )}
                         <p className="text-xs text-gray-400 mt-1">JPG, PNG or GIF format</p>
                       </label>
                     </div>

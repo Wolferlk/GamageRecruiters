@@ -87,11 +87,41 @@ const useSetUserProfileCompletion = (user) => {
 
     const totalFields = Object.entries(user).length - 3;
 
-    console.log('Data Count', filledDataCount);
-    console.log('Total Fields', totalFields); // Have to remove createdAt, userId and password ...
+    // console.log('Data Count', filledDataCount);
+    // console.log('Total Fields', totalFields); // Have to remove createdAt, userId and password ...
 
     const filledDataPercentage = ((filledDataCount - 3) / (totalFields - 3)) * 100;
     return `${Math.ceil(filledDataPercentage)}%`;
 }
 
-export { useConCatName, useChangeDateFormat, useCalculateAge, useSetUserProfileCompletion };
+const useCheckValidCVFile = (file) => {
+    const allowedTypes = [
+        "application/pdf", //.pdf ...
+        "application/msword", // .doc ...
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" // .docx ...
+    ]
+
+    if(!allowedTypes.includes(file.type)) {
+        return false;
+    }
+
+    return true;
+} 
+
+const useCheckValidImageFile = (file) => {
+    const allowedImageTypes = [
+        "image/png", 
+        "image/jpeg", 
+        "image/jpg", 
+        "image/gif", 
+        "image/webp"
+    ]; 
+
+    if(!allowedImageTypes.includes(file.type)) {
+        return false;
+    } 
+
+    return true;
+}
+
+export { useConCatName, useChangeDateFormat, useCalculateAge, useSetUserProfileCompletion, useCheckValidImageFile, useCheckValidCVFile };

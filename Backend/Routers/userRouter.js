@@ -4,6 +4,12 @@ const userController = require('../Controllers/userController');
 
 const router = express.Router();
 
+// Update User CV Route ...
+router.put('/update-user-cv', upload, userController.uploadUserCV);
+
+// Upload User Image Route ...
+router.put('/upload-user-image', upload, userController.uploadUserImage);
+
 // Update Profile Route ...
 router.put('/update-user-data', upload, userController.updateUserDetails);
 

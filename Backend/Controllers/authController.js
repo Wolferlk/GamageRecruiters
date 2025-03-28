@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const { pool } = require('../config/dbConnection');
 const { otpCache, generateOTP, sendOTP } = require('../middlewares/OTP');
+const { localStorage, encryptData } = require('../utils/localStorage');
 
 dotenv.config();
 
@@ -71,8 +72,8 @@ async function login (req, res) {
             // Pass a Cookie to frontend ...
             res.cookie('token', token, {
                 httpOnly: true,
-                sameSite: 'none',
-                secure: true,
+                sameSite: 'Lax',
+                secure: false,
                 maxAge: 100 * 60 * 60, // 1 hour ...
             });
 
@@ -84,6 +85,15 @@ async function login (req, res) {
                     // console.log(error);
                     return res.status(400).send('Error creating session');
                 } 
+
+                const key = "Saved User Data";
+                const userData = [result[0].userId, 'Email & Password'];
+                            
+                // Encrypt the array (convert it to a JSON string first) ...
+                const { encryptedData, iv } = encryptData(JSON.stringify(userData));
+                            
+                // Store encrypted data and IV in localStorage ...
+                localStorage.setItem(key, JSON.stringify({ encryptedData, iv }));
 
                 return res.status(200).json({ message: 'Login Successful', token: token, data: data });
             });
