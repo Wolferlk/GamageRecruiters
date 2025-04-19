@@ -21,6 +21,7 @@ import EmailCheck from './Pages/EmailCheck';
 import ResetPassword from './Pages/ResetPassword';
 import TestimonialsSection from './Pages/TestimonialsSection';
 import WindowOnClose from './protected/WindowOnClose';
+import ProtectedRoute from './protected/ProtectedRoute';
 
 function App() {
   return (
@@ -42,12 +43,12 @@ function App() {
             <Route path='/emailCheck' element={<EmailCheck/>} />
             <Route path='/resetPassword' element={<ResetPassword/>} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/application/:jobApplicationId" element={<Application />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/application/:jobApplicationId" element={<ProtectedRoute><Application /></ProtectedRoute>} />
             <Route path="/trusted-partners" element={<TrustedPartners />} />
             <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:blogId" element={<BlogDetailsPage />} />
-            <Route path="/workshop" element={<WorkshopsAndSeminarsPage />} />
+            <Route path="/blog/:blogId" element={<ProtectedRoute><BlogDetailsPage /></ProtectedRoute>} />
+            <Route path="/workshop" element={<ProtectedRoute><WorkshopsAndSeminarsPage /></ProtectedRoute>} />
             <Route path="/testimonials" element={<TestimonialsSection />} />
           </Routes>
         </main>

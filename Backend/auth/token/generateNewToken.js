@@ -7,7 +7,7 @@ const setTimeStampToDate = require("../../utils/changeDateFormat");
 dotenv.config();
 
 async function generateNewAccessToken (id, token) {
-    if(!id || !date) {
+    if(!id || !token) {
         return 'Error Occured. Cannot proceed.';
     }
 
@@ -27,7 +27,7 @@ async function generateNewAccessToken (id, token) {
             // get the logged user data from session ...
             pool.query(updateTokenQuery, [newToken, id, token], (error, result) => {
                 if(error) {
-                    // console.log(error);
+                    console.log(error);
                     return reject(error);
                 } 
         

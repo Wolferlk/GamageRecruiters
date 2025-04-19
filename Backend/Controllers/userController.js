@@ -19,16 +19,31 @@ async function uploadUserImage (req, res) {
         console.log(imageName);
 
         if(imageName) {
-            const updateImageQuery = 'UPDATE users SET photo = ?, recentActivity = ?, updatedAt = ? WHERE userId = ?';
-            pool.query(updateImageQuery, [imageName, 'Updated User Profile Image', new Date(), id], (error, result) => {
+            const updateImageQuery = 'UPDATE users SET photo = ? WHERE userId = ?';
+            pool.query(updateImageQuery, [imageName, id], (error, result) => {
                 if(error) {
-                    return res.status(400).send('Image Upload Failed');
+                    return res.status(400).send(error);
                 } 
 
-                return res.status(200).json({ message: 'Image Uploaded Successfully', data: result, image: imageName });
+                if(result.affectedRows == 0) {
+                    return res.status(400).send('Image Upload Failed');
+                }
+
+                const setActivityQuery = 'INSERT INTO activitylogs (userId, activity, completedAt) VALUES (?, ?, ?)';
+                pool.query(setActivityQuery, [id, 'Updated User Image', new Date()], (error, log) => {
+                    if(error) {
+                        return res.status(400).send(error);
+                    }
+
+                    if(result.affectedRows == 0) {
+                        return res.status(400).send('Log Insertion Failed');
+                    }
+
+                    return res.status(200).json({ message: 'Image Uploaded Successfully', data: log, image: imageName });
+                });
             });
         } else {
-            return res.status(400).send('No image provided');
+            return res.status(403).send('No image provided');
         }
     } catch (error) {
         console.log(error);
@@ -49,16 +64,31 @@ async function uploadUserCV (req, res) {
         console.log(cvName);
 
         if(cvName) {
-            const updateImageQuery = 'UPDATE users SET cv = ?, recentActivity = ?, updatedAt = ? WHERE userId = ?';
-            pool.query(updateImageQuery, [cvName, 'Updated User CV', new Date(), id], (error, result) => {
+            const updateImageQuery = 'UPDATE users SET cv = ? WHERE userId = ?';
+            pool.query(updateImageQuery, [cvName, id], (error, result) => {
                 if(error) {
-                    return res.status(400).send('Image Upload Failed');
+                    return res.status(400).send(error);
                 } 
 
-                return res.status(200).json({ message: 'Image Uploaded Successfully', data: result, cv: cvName });
+                if(result.affectedRows == 0) {
+                    return res.status(400).send('CV Upload Failed');
+                }
+
+                const setActivityQuery = 'INSERT INTO activitylogs (userId, activity, completedAt) VALUES (?, ?, ?)';
+                pool.query(setActivityQuery, [id, 'Updated User CV', new Date()], (error, log) => {
+                    if(error) {
+                        return res.status(400).send(error);
+                    }
+
+                    if(result.affectedRows == 0) {
+                        return res.status(400).send('Log Insertion Failed');
+                    }
+
+                    return res.status(200).json({ message: 'CV Uploaded Successfully', data: log, cv: cvName });
+                });
             });
         } else {
-            return res.status(400).send('No CV provided');
+            return res.status(403).send('No CV provided');
         }
     } catch (error) {
         console.log(error);
@@ -82,71 +112,69 @@ async function updateUserDetails (req, res) {
         console.log('cvName:', cvName);
         console.log('imageName:', imageName); 
 
+        let values;
+        let updateQuery;
+
         if(cvName == null && imageName == null) {
-            const values = [firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, linkedInLink, facebookLink, portfolioLink, profileDescription, 'Updated User Profile Details', new Date(), userId];
+            values = [firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, linkedInLink, facebookLink, portfolioLink, profileDescription, 'Updated User Profile Details', new Date(), userId];
 
-            const updateQuery = `UPDATE users 
+            updateQuery = `UPDATE users 
                                     SET firstName = ?, lastName = ?, gender = ?, birthDate = ?, address = ?, address2 = ?, 
-                                    phoneNumber1 = ?, phoneNumber2 = ?, linkedInLink = ?, facebookLink = ?, 
-                                    portfolioLink = ?, profileDescription = ?, recentActivity = ?, updatedAt = ? 
+                                    phoneNumber1 = ?, phoneNumber2 = ?, linkedInLink = ?, facebookLink = ?, portfolioLink = ? 
                                     WHERE userId = ?`;
-            pool.query(updateQuery, values, (error, result) => {
-                if(error) {
-                    console.log(error);
-                    return res.status(400).send('An error occured during update');
-                }
-
-                return res.status(200).json({ message: 'User Data Updated Successfully', data: result });
-            });
+            
         } else if (cvName == null && imageName != null) {
-            const values = [firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, photo, linkedInLink, facebookLink, portfolioLink, profileDescription, 'Updated User Profile Details', new Date(), userId];
+            values = [firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, photo, linkedInLink, facebookLink, portfolioLink, profileDescription, 'Updated User Profile Details', new Date(), userId];
 
-            const updateQuery = `UPDATE users 
+            updateQuery = `UPDATE users 
                                     SET firstName = ?, lastName = ?, gender = ?, birthDate = ?, address = ?, address2 = ?, 
                                     phoneNumber1 = ?, phoneNumber2 = ?, photo = ?, linkedInLink = ?, facebookLink = ?, 
                                     portfolioLink = ?, profileDescription = ?, recentActivity = ?, updatedAt = ? 
                                     WHERE userId = ?`;
-            pool.query(updateQuery, values, (error, result) => {
-                if(error) {
-                    console.log(error);
-                    return res.status(400).send('An error occured during update');
-                }
-
-                return res.status(200).json({ message: 'User Data Updated Successfully', data: result });
-            });
+            
         } else if (cvName != null && imageName == null) {
-            const values = [firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, cv, linkedInLink, facebookLink, portfolioLink, profileDescription, 'Updated User Profile Details', new Date(), userId];
+            values = [firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, cv, linkedInLink, facebookLink, portfolioLink, profileDescription, 'Updated User Profile Details', new Date(), userId];
 
-            const updateQuery = `UPDATE users 
+            updateQuery = `UPDATE users 
                                     SET firstName = ?, lastName = ?, gender = ?, birthDate = ?, address = ?, address2 = ?, 
                                     phoneNumber1 = ?, phoneNumber2 = ?, cv = ?, linkedInLink = ?, facebookLink = ?, 
                                     portfolioLink = ?, profileDescription = ?, recentActivity = ?, updatedAt = ? 
                                     WHERE userId = ?`;
-            pool.query(updateQuery, values, (error, result) => {
-                if(error) {
-                    console.log(error);
-                    return res.status(400).send('An error occured during update');
-                }
-
-                return res.status(200).json({ message: 'User Data Updated Successfully', data: result });
-            });
+            
         } else {
-            const values = [firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, photo, cv, linkedInLink, facebookLink, portfolioLink, profileDescription, 'Updated User Profile Details', new Date(), userId];
+            values = [firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, photo, cv, linkedInLink, facebookLink, portfolioLink, profileDescription, 'Updated User Profile Details', new Date(), userId];
 
-            const updateQuery = `UPDATE users 
+            updateQuery = `UPDATE users 
                                     SET firstName = ?, lastName = ?, gender = ?, birthDate = ?, address = ?, address2 = ?, 
                                     phoneNumber1 = ?, phoneNumber2 = ?, photo = ?, cv = ?, linkedInLink = ?, facebookLink = ?, 
                                     portfolioLink = ?, profileDescription = ?, recentActivity = ?, updatedAt = ? 
                                     WHERE userId = ?`;
-            pool.query(updateQuery, values, (error, result) => {
+
+        }
+
+        pool.query(updateQuery, values, (error, result) => {
+            if(error) {
+                console.log(error);
+                return res.status(400).send('An error occured during update');
+            }
+
+            if(result.affectedRows == 0) {
+                return res.status(400).send('User Data Update Failed');
+            }
+
+            const setActivityQuery = 'INSERT INTO activitylogs (userId, activity, completedAt) VALUES (?, ?, ?)';
+            pool.query(setActivityQuery, [userId, 'Updated User Data', new Date()], (error, log) => {
                 if(error) {
-                    console.log(error);
-                    return res.status(400).send('An error occured during update');
+                    return res.status(400).send('Activity Log Failed');
                 }
 
-                return res.status(200).json({ message: 'User Data Updated Successfully', data: result });
+                if(result.affectedRows == 0) {
+                    return res.status(400).send('Log Insertion Failed');
+                }
+
+                return res.status(200).json({ message: 'User Data Updated Successfully', data: log });
             });
-        }
+        });
     } catch (error) {
         console.log(error);
         return res.status(500).send(error);
@@ -155,20 +183,35 @@ async function updateUserDetails (req, res) {
 
 async function deleteUser (req, res) {
     try {
-        const id = req.params.id;
+        const userId = req.params.userId;
 
-        if(!id) {
+        if(!userId) {
             return res.status(400).send('Deletion Failed');
         }
 
-        const sql = 'DELETE FROM users WHERE userId = ?';
-        pool.query(sql, [id], (error, result) => {
+        console.log(userId);
+
+        const removeSessionQuery = 'DELETE FROM sessions WHERE Id = ?';
+        pool.query(removeSessionQuery, userId, (error, result) => {
             if(error) {
-                return res.status(400).send('Deletion Failed');
+                console.log(error);
+                return res.status(400).send(error);
             } 
 
-            localStorage.clear();
-            return res.status(200).json({ message: 'User Deleted Successfully', data: result });
+            if(result.affectedRows == 0) {
+                return res.status(400).send('Deletion Failed');
+            }
+
+            const sql = 'DELETE FROM users WHERE userId = ?';
+            pool.query(sql, userId, (error, result) => {
+                if(error) {
+                    console.log(error);
+                    return res.status(400).send('Deletion Failed');
+                } 
+
+                localStorage.clear();
+                return res.status(200).json({ message: 'User Deleted Successfully', data: result });
+            });
         });
     } catch (error) {
         console.log(error);
@@ -205,11 +248,26 @@ async function changePassword (req, res) {
 
             pool.query(updatePasswordQuery, [hashedNewPassword, 'Changed User Password', new Date(), userId], (error, result) => {
                 if(error) {
+                    return res.status(400).send(error);
+                }
+
+                if(result.affectedRows == 0) {
                     return res.status(400).send('Password Change Failed');
                 }
 
-                return res.status(200).json({ message: 'Password Changed Successfully', data: result });
-            })
+                const setActivityQuery = 'INSERT INTO activitylogs (userId, activity, completedAt)';
+                pool.query(setActivityQuery, [userId, `Changed User Password From ${oldPassword} to ${newPassword}`, new Date()], (error, log) => {
+                    if(error) {
+                        return res.status(400).send('Activity Log Failed');
+                    }
+
+                    if(log.affectedRows == 0) {
+                        return res.status(400).send('Log Insertion Failed');
+                    }
+
+                    return res.status(200).json({ message: 'Password Changed Successfully', data: log });
+                });
+            });
         });
     } catch (error) {
         console.log(error);
@@ -283,7 +341,7 @@ async function getRecentProfileActivity(req, res) {
     }
 
     try {
-        const recentActivityQuery = 'SELECT recentActivity, updatedAt FROM users WHERE userId = ?';
+        const recentActivityQuery = 'SELECT * FROM activitylogs INNER JOIN users ON activitylogs.userId = users.userId WHERE activitylogs.userId = ? ORDER BY activitylogs.completedAt DESC LIMIT 1';
         pool.query(recentActivityQuery, userId, (error, result) => {
             if(error) {
                 console.log(error);
@@ -294,10 +352,10 @@ async function getRecentProfileActivity(req, res) {
                 return res.status(404).send('No recent activity found for this user');
             } 
 
-            const recentActivity = result[0].recentActivity;
-            const updatedAt = result[0].updatedAt ? setTimeStatus(result[0].updatedAt) : null;
+            const recentActivity = result[0].activity;
+            const completedAt = result[0].completedAt ? setTimeStatus(result[0].completedAt) : null;
 
-            return res.status(200).json({ message: 'Recent Activity Found', recentActivity: recentActivity, timeStatus: updatedAt });
+            return res.status(200).json({ message: 'Recent Activity Found', recentActivity: recentActivity, timeStatus: completedAt });
         });
     } catch (error) {
         console.log(error);

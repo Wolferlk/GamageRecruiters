@@ -86,6 +86,8 @@ const TrustedPartners = () => {
   const rightScrollRef = useRef(null);
 
   useEffect(() => {
+    localStorage.clear();
+    
     const animateLeftScroll = () => {
       if (leftScrollRef.current) {
         if (leftScrollRef.current.scrollLeft >= leftScrollRef.current.scrollWidth / 2) {

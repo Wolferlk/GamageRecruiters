@@ -6,26 +6,56 @@ const { fetchLoggedUserIdAndMethod } = require('../utils/retrieveLocalStorageDat
 
 dotenv.config();
 
-async function handleAccessToken (req, res) {
-    const { userId, token } = req.body;
+async function verifyAccessToken (req, res) {
+    const token  = req.params.token;
 
     if(!token) {
-        return res.status(400).send('Token Required');
+        return res.send('Token not provided');
     }
 
     try {
-        console.log(token);
-        // decode the token ...
-        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(decodedToken);
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        // ✅ Token is valid ...
+        return res.send('Token is Valid'); // Optional: return decoded data if needed ...
     } catch (error) {
         if (error.name === "TokenExpiredError") {
-            console.log('Token Expired');
-            // generate a new Token to proceed ...
+            // console.log('Token is Expired');
+            return res.send('Token is Expired');
+        } else if (error.name === "JsonWebTokenError") {
+            // console.log("Token is Invalid:", error.message);
+            return res.send("Token is Invalid");
+        } else {
+            // console.log(error.message);
+            return res.status(500).send(error.message);
+        }
+    }
+}
+
+async function handleAccessToken (req, res) {
+    const { token } = req.body;
+
+    if(!token) {
+        return res.status(400).send('Token & userId Required');
+    }
+
+    try {
+        const sessionDataQuery = 'SELECT * FROM sessions WHERE token = ?';
+        pool.query(sessionDataQuery, token, async (error, result) => {
+            if(error) {
+                console.log(error);
+                return res.status(400).send(error);
+            }
+
+            if(result.length == 0) {
+                return res.status(404).send('Session Data Not Found');
+            }
+
+            const userId = result[0].Id;
             try {
                 const newToken = await generateNewAccessToken(userId, token);
+                console.log(newToken);
                 if(newToken) {
-                    return res.status(200).json({ message: 'Token generated successfully', token: newToken });
+                    return res.status(201).json({ message: 'Token generated successfully', token: newToken });
                 } else {
                     return res.status(400).send('Token Creating Error');
                 }
@@ -33,13 +63,50 @@ async function handleAccessToken (req, res) {
                 console.log(error);
                 return res.status(500).send(error.message);
             }
-        } else if (error.name === "JsonWebTokenError") {
-            console.log("Invalid Token:", error.message);
-            return res.status(400).send("Invalid Token");
-        } else {
-            console.log(error.message);
-            return res.status(500).send(error.message);
-        }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send(error.message);
+    }
+}
+
+async function getTokenRelatedLoggedUserData (req, res) {
+    const token = req.params.token;
+
+    if(!token) {
+        return res.status(400).send('Token Required');
+    }
+
+    try {
+        const sessionLoggedUserDataQuery = 'SELECT * FROM sessions WHERE token = ?';
+        pool.query(sessionLoggedUserDataQuery, token, (error, result) => {
+            if(error) {
+                console.log(error);
+                return res.status(400).send(error);
+            } 
+
+            if(result.length == 0) {
+                return res.status(404).send('Session Data Not Found');
+            }
+
+            const userId = result[0].Id;
+            const userDataQuery = 'SELECT * FROM users WHERE userId = ?';
+            pool.query(userDataQuery, userId, (error, user) => {
+                if(error) {
+                    console.log(error);
+                    return res.status(400).send(error);
+                }
+
+                if(user.length == 0) {
+                    return res.status(404).send('User Data Not Found');
+                }
+
+                return res.status(200).json({ message: 'User Data Found', data: user });
+            });    
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send(error.message);
     }
 }
 
@@ -105,7 +172,7 @@ async function getLoggedUserData (req, res) {
 
             if(!userData) {
                 return res.status(404).send('User Not Found');
-            }
+            } 
 
             return res.status(200).json({ message: 'User Data Retrieved', data: userData });
         } catch (error) {
@@ -246,4 +313,4 @@ async function getUserLoginAttempts (req, res) {
     }
 }
 
-module.exports = { getLoggedUserData, getUserLoginAttempts, handleAccessToken };
+module.exports = { getLoggedUserData, getTokenRelatedLoggedUserData, getUserLoginAttempts, handleAccessToken, verifyAccessToken };

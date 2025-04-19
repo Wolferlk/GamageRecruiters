@@ -9,8 +9,6 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import Swal from 'sweetalert2';
 
-
-
 // Import the components
 import ProfileOverview from "../components/dashboard/ProfileOverview";
 import AppliedJobs from "../components/dashboard/AppliedJobs";
@@ -20,6 +18,8 @@ import { useConCatName, useChangeDateFormat, useSetUserProfileCompletion, useSet
 import handleToken from "../scripts/handleToken";
 import baseURL from "../config/axiosPortConfig";
 import SessionTimeout from "../protected/SessionTimeout";
+import verifyToken from "../scripts/verifyToken";
+import { useNavigate } from "react-router-dom";
 
 // Animated Tab Context
 const TabContext = ({ children, defaultTab }) => {
@@ -109,13 +109,14 @@ export default function Dashboard() {
   const [isFirstVisit, setIsFirstVisit] = useState(true);
   const [user, setUser] = useState({});
   const [profileCompletionPercentage, setProfileCompletionPercentage] = useState('');
-  const [accessToken, setAccessToken] = useState('');
   const [loggedUserId, setLoggedUserId] = useState('');
   const [jobStatus, setJobStatus] = useState('');
   const [jobData, setJobData] = useState({});
   const [lastActive, setLastActive] = useState('');
   const [lastProfileActivity, setLastProfileActivity] = useState('');
   const [lastProfileActivityTime, setLastProfileActivityTime] = useState('');
+  const [accessToken, setAccessToken] = useState('');
+  const navigate = useNavigate();
 
   // const [user, setUser] = useState({
   //   userId: "001",
@@ -222,6 +223,7 @@ export default function Dashboard() {
     fetchLoggedUserData();
 
     if(loggedUserId) {
+      console.log(loggedUserId);
       fetchAppliedJobCount(loggedUserId);
       fetchAppliedJobCount(loggedUserId);
       fetchJobApplicationStatusForUser(loggedUserId);
@@ -394,11 +396,46 @@ export default function Dashboard() {
         if(loggedUserResponse.status === 200) {
           setUser(loggedUserResponse.data.data.user[0]);
           setLoggedUserId(loggedUserResponse.data.data.user[0].userId);
+          console.log(loggedUserResponse.data.data.token);
           setAccessToken(loggedUserResponse.data.data.token);
           const percentage = useSetUserProfileCompletion(loggedUserResponse.data.data.user[0]);
           setProfileCompletionPercentage(percentage);
-          // Store Token In localStorage ...
-          localStorage.setItem('AccessToken', loggedUserResponse.data.data.token);
+          const response = await verifyToken(loggedUserResponse.data.data.token);
+          if(response === 'Token is Valid') {
+            console.log('Token Authentication Successfull');
+            return;
+          } else if(response === 'Token is Expired') {
+            console.log('Token Expired');
+            const generateNewTokenResponse = handleToken(loggedUserResponse.data.data.token);
+            console.log(generateNewTokenResponse);
+            if(generateNewTokenResponse === 'Token Authentication Successfull') {
+              console.log('Token Authentication Successfull');
+              const newToken = localStorage.getItem('AccessToken');
+              setAccessToken(newToken);
+            } else {
+              console.log('Failed to generate new token');
+              return;
+            }
+          } else if(response === 'Token is Invalid') {
+            console.log('Token Invalid');
+            localStorage.clear();
+            navigate('/login');
+            return;
+          } else if(response === 'Token is not provided') {
+            console.log('Token Not Provided');
+            return;
+          } else {
+            console.log('Error Occurred While checking Token Validity');
+            return;
+          }
+          // if (!handleToken(loggedUserResponse.data.data.token)) {
+          //   console.log('Token is not valid');
+          //   return;
+          // } else {
+          //   console.log('Token Authentication Successfull');
+          //   localStorage.setItem('AccessToken', loggedUserResponse.data.data.token);
+          //   return;
+          // }
         } else {
           console.log('Failed To Load User Data');
           return;

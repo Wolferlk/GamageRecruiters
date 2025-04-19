@@ -147,9 +147,6 @@ const ProfileOverview = ({ user }) => {
                 text: 'You have been logged out successfully!',
                 confirmButtonColor: '#3085d6',
               });
-              localStorage.removeItem('User Auth Token');
-              localStorage.removeItem('Login Method');
-              localStorage.removeItem('Token Expires At');
               localStorage.clear();
               navigate('/');
             } else {

@@ -98,6 +98,7 @@ const AccountSettings = ({ user }) => {
               text: 'User Account Terminated!',
               confirmButtonColor: '#3085d6',
             });
+            localStorage.clear();
             navigate('/');
           } else {
             setError('Account Termination Failed');

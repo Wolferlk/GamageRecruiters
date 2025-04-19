@@ -8,11 +8,11 @@ dotenv.config();
 async function addNewUserIfSessionUserNotFound(firstName, lastName, email) {
     return new Promise((resolve, reject) => {
         // Create a new user ...
-        const insertDataQuery = 'INSERT INTO users (firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, linkedInLink, facebookLink, portfolioLink, email, password, cv, photo, profileDescription, createdAt, recentActivity, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        const values = [firstName, lastName, null, null, null, null, null, null, null, null, null, email, null, null, null, null, new Date(), null, null];
+        const insertDataQuery = 'INSERT INTO users (firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, linkedInLink, facebookLink, portfolioLink, email, password, cv, photo, profileDescription, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        const values = [firstName, lastName, null, null, null, null, null, null, null, null, null, email, null, null, null, null, new Date()];
         pool.query(insertDataQuery, values, (error, result) => {
             if (error) {
-                // console.log(error);
+                console.log(error);
                 return reject('Error creating new user');
             }
 
