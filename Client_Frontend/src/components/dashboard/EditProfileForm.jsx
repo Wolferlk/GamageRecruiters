@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { useChangeDateFormat } from "../../hooks/customHooks";
 import baseURL from "../../config/axiosPortConfig";
+import { useNavigate } from "react-router-dom";
 
 const EditProfileForm = ({ user, setUser }) => {
   const [formData, setFormData] = useState({ ...user });
+  const navigate = useNavigate();
 
   useEffect(() => {
     setFormData({ ...user });
@@ -20,7 +22,7 @@ const EditProfileForm = ({ user, setUser }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback((e) => {
     e.preventDefault();
     console.log(formData);
     Swal.fire({
@@ -51,6 +53,7 @@ const EditProfileForm = ({ user, setUser }) => {
                 profileDescription: formData.profileDescription
               });
               console.log(updateResponse);
+              console.log(updateResponse.data.message);
               if(updateResponse.status == 200) {
                 Swal.fire({
                   icon: 'success',
@@ -63,13 +66,14 @@ const EditProfileForm = ({ user, setUser }) => {
                 return;
               }
             } catch (error) {
+              toast.error('Update Failed');
               console.log(error);
               return;
             }
           }
         });
     // alert("Profile updated successfully!");
-  };
+  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
@@ -248,12 +252,12 @@ const EditProfileForm = ({ user, setUser }) => {
 
         {/* Buttons */}
         <div className="flex justify-end gap-3">
-          <button
+          {/* <button
             type="button"
             className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
           >
             Cancel
-          </button>
+          </button> */}
           <button
             type="submit"
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
@@ -266,4 +270,4 @@ const EditProfileForm = ({ user, setUser }) => {
   );
 };
 
-export default EditProfileForm;
+export default  memo(EditProfileForm);

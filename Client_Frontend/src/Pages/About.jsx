@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import TestominolsSection from '../components/Home/TestominolsSection';
 import TeamMembers from '../components/Home/TeamSection';
+import { memo } from 'react';
 
 const stats = [
   { label: 'Years in Business', value: '10+' },
@@ -30,7 +31,7 @@ const subsidiaries = [
   }
 ];
 
-export default function About() {
+function About() {
   return (
     <div className="bg-white">
       {/* Hero Section - Parallax Effect */}
@@ -257,3 +258,5 @@ export default function About() {
     </div>
   );
 }
+
+export default memo(About); 

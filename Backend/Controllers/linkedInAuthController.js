@@ -21,8 +21,10 @@ async function loginLinkedInCallback (req, res) {
     try {
         // Store user in session ...
         req.session.user = req.user; 
-        
         // console.log("User stored in session:", req.session.user);
+
+        // Fetch the URL from localStorage ...
+        const url = fetchFrontendApplicationRunningURL();
 
         const sql = 'INSERT INTO LoginsThroughPlatforms (accountId, photo, name, email, loggedAt, platform) VALUES (?, ?, ?, ?, ?, ?)';
         const values = [req.session.user.id, req.session.user.photo, req.session.user.name, req.session.user.email, new Date(), 'LinkedIn'];
@@ -31,7 +33,7 @@ async function loginLinkedInCallback (req, res) {
                 return res.status(400).send('Error Saving Data');
             } 
 
-            setLoggedUserIdAndMethod(req.session.user.id, 'Google');
+            setLoggedUserIdAndMethod(req.session.user.id, 'LinkedIn');
 
             const userQuery = 'SELECT * FROM Users WHERE email = ?';
             pool.query(userQuery, [req.session.user.email], async (error, result) => {
@@ -56,7 +58,7 @@ async function loginLinkedInCallback (req, res) {
                             return res.status(404).send('Error Occured. Cannot proceed.');
                         }
 
-                        return res.redirect(process.env.SUCCESS_REDIRECT_URL);
+                        return res.redirect(`${url}/dashboard`);
                     } catch (error) {
                         console.error(error);
                         return res.status(500).send(error);
@@ -73,7 +75,7 @@ async function loginLinkedInCallback (req, res) {
                 }
                 
                 // Redirect to frontend after setting session and save data ...
-                return res.redirect(process.env.SUCCESS_REDIRECT_URL);
+                return res.redirect(`${url}/dashboard`);
             });
         });
     } catch (error) {

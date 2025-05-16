@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
@@ -273,7 +273,7 @@ const ParallaxBackground = () => {
   );
 };
 
-export default function Services() {
+function Services() {
   const [activeTab, setActiveTab] = useState(0);
   
   // For rotating text animation
@@ -799,3 +799,5 @@ export default function Services() {
     </div>
   );
 }
+
+export default memo(Services);

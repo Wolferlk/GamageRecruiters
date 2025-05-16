@@ -100,7 +100,9 @@ async function updateUserDetails (req, res) {
     const { userId } = req.params;
     const { firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, photo, cv, linkedInLink, facebookLink, portfolioLink, profileDescription } = req.body; 
 
-    if(!userId || !firstName || !lastName || !gender || !birthDate || !address || !phoneNumber1 || !cv || !profileDescription) {
+    console.log(firstName, lastName, gender, birthDate, address, address2, phoneNumber1, phoneNumber2, photo, cv, linkedInLink, facebookLink, portfolioLink, profileDescription, userId);
+
+    if(!userId || !firstName || !lastName || !gender || !birthDate || !address || !phoneNumber1 || !profileDescription) {
         return res.status(400).send('Error With required fields');
     } 
 
@@ -165,6 +167,7 @@ async function updateUserDetails (req, res) {
             const setActivityQuery = 'INSERT INTO activitylogs (userId, activity, completedAt) VALUES (?, ?, ?)';
             pool.query(setActivityQuery, [userId, 'Updated User Data', new Date()], (error, log) => {
                 if(error) {
+                    console.log(error);
                     return res.status(400).send('Activity Log Failed');
                 }
 
@@ -231,12 +234,12 @@ async function changePassword (req, res) {
         const userDataQuery = 'SELECT * FROM users WHERE userId = ?';
         pool.query(userDataQuery, [userId], async (error, result) => {
             if(error) {
+                console.log(error);
                 return res.status(404).send('User Not Found');
             }
 
             // check oldPassword validity ...
             const isValidOldPassword = await bcrypt.compare(oldPassword, result[0].password);
-
             if(!isValidOldPassword) {
                 return res.status(400).send('Old Password is incorrect !');
             }
@@ -244,10 +247,11 @@ async function changePassword (req, res) {
             const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
             // update password in database ...
-            const updatePasswordQuery = 'UPDATE users SET password = ?, recentActivity = ?, updatedAt = ? WHERE userId = ?';
+            const updatePasswordQuery = 'UPDATE users SET password = ? WHERE userId = ?';
 
-            pool.query(updatePasswordQuery, [hashedNewPassword, 'Changed User Password', new Date(), userId], (error, result) => {
+            pool.query(updatePasswordQuery, [hashedNewPassword, userId], (error, result) => {
                 if(error) {
+                    console.log(error);
                     return res.status(400).send(error);
                 }
 
@@ -255,9 +259,10 @@ async function changePassword (req, res) {
                     return res.status(400).send('Password Change Failed');
                 }
 
-                const setActivityQuery = 'INSERT INTO activitylogs (userId, activity, completedAt)';
+                const setActivityQuery = 'INSERT INTO activitylogs (userId, activity, completedAt) VALUES (?, ?, ?)';
                 pool.query(setActivityQuery, [userId, `Changed User Password From ${oldPassword} to ${newPassword}`, new Date()], (error, log) => {
                     if(error) {
+                        console.log(error);
                         return res.status(400).send('Activity Log Failed');
                     }
 

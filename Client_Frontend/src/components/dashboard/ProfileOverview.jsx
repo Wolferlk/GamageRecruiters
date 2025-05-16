@@ -1,5 +1,5 @@
 import { Edit3, User, ExternalLink, Pointer } from "lucide-react";
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -41,15 +41,15 @@ const ProfileOverview = ({ user }) => {
     }
   } 
 
-  const handleCVChange = (e) => {
+  const handleCVChange = useCallback((e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setCV(selectedFile); 
       setCVSelected(true);
     }
-  }
+  }, [cv, cvSelected]);
 
-  const handleUploadImage = async () => {
+  const handleUploadImage = useCallback(async () => {
 
     if(!image) {
       toast.error('Please select an image to proceed');
@@ -86,9 +86,9 @@ const ProfileOverview = ({ user }) => {
       console.log(error);
       return;
     }
-  }
+  }, [image, selectedImage]);
 
-  const handleCVUpdate = async () => {
+  const handleCVUpdate = useCallback(async () => {
     if(!cv) {
       toast.error('Please select an cv to proceed');
       return;
@@ -124,9 +124,9 @@ const ProfileOverview = ({ user }) => {
       console.log(error);
       return;
     }
-  } 
+  }, [cv, cvSelected]); 
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     Swal.fire({
       title: 'Confirmation About Logout',
       text: 'Are you sure you want to Logout from the system ?',
@@ -164,7 +164,7 @@ const ProfileOverview = ({ user }) => {
             return;
           }
         }});
-  }
+  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 transition-all">
@@ -288,4 +288,4 @@ const ProfileOverview = ({ user }) => {
   );
 };
 
-export default ProfileOverview;
+export default memo(ProfileOverview);

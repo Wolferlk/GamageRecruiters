@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Quote, Star } from 'lucide-react';
 
@@ -219,4 +219,4 @@ const TestimonialsSection = () => {
   );
 };
 
-export default TestimonialsSection;
+export default memo(TestimonialsSection);

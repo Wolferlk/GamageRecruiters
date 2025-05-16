@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import axios from "axios";
@@ -101,7 +101,7 @@ const daysAgo = (dateString) => {
   return diffDays;
 };
 
-export default function JobListings() {
+function JobListings() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
   const [selectedJobType, setSelectedJobType] = useState('All Types');
@@ -123,7 +123,7 @@ export default function JobListings() {
     return () => clearTimeout(timer);
   }, []);
 
-  const loadJobs = async () => {
+  const loadJobs =  useCallback(async () => {
       try {
         const loadJobsResponse = await axios.get(`${baseURL}/api/jobs`);
         console.log(loadJobsResponse.data);
@@ -140,7 +140,7 @@ export default function JobListings() {
         console.log(error);
         return;
       }
-    }
+    }, [jobs]);
   
   // Filter jobs based on search and filter criteria
   const filteredJobs = jobs.filter(job => {
@@ -203,13 +203,13 @@ export default function JobListings() {
 
     const navigate = useNavigate();
 
-    const viewJob = (id) => {
+    const viewJob = useCallback((id) => {
       console.log(id);
 
       if(id) {
         navigate(`/jobs/${id}`, { replace: true });
       }
-    }
+    }, [navigate]);
 
     return (
       <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 border border-gray-100 relative group">
@@ -485,3 +485,5 @@ export default function JobListings() {
     </div>
   );
 }
+
+export default memo(JobListings);

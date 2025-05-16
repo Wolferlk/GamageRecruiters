@@ -22,7 +22,7 @@ const blogRoutes = require('./Routers/blogRouter');
 const testimonialsRouter = require('./Routers/testimonialsRouter');
 const workshopRouter = require('./Routers/workshopsRouter');
 const contactRouter = require('./Routers/contactRouter');
-
+const urlCaptureRouter = require('./Routers/urlCaptureRouter');
 
 require('dotenv').config();
 require('./auth/passportAuthGoogle');
@@ -110,6 +110,8 @@ app.use('/', googleAuthRouter);
 app.use('/', facebookAuthRouter);
 app.use('/', linkedInAuthRouter);
 
+app.use('/', urlCaptureRouter);
+
 app.use('/api/jobapplications', jobapplicationRouter);
 app.use('/api/jobs', JobsManagementRouter);
 
@@ -118,7 +120,6 @@ app.use('/api/workshops', workshopRouter);
 app.use("/api/testimonials",testimonialsRouter);
 
 app.use('/api/blogs', blogRoutes);
-
 
 
 app.listen(PORT, () => {

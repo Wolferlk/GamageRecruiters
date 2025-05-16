@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Key, AlertTriangle } from "lucide-react";
 import axios from 'axios';
@@ -23,7 +23,7 @@ const AccountSettings = ({ user }) => {
     setPasswordData({ ...passwordData, [name]: value });
   };
 
-  const handlePasswordSubmit = async (e) => {
+  const handlePasswordSubmit = useCallback(async (e) => {
     e.preventDefault();
 
     if (passwordData.newPassword.length < 6) {
@@ -69,13 +69,13 @@ const AccountSettings = ({ user }) => {
             return;
           }
         } catch (error) {
+          setError('Password Change Failed');
           console.log(error);
           return;
         }
       }
     });
-
-  };
+  }, [passwordData]);
 
   const handleTerminateAccount = () => {
     Swal.fire({
@@ -215,4 +215,4 @@ const AccountSettings = ({ user }) => {
   );
 };
 
-export default AccountSettings;
+export default memo(AccountSettings);

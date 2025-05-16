@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -12,7 +12,7 @@ import baseURL from '../config/axiosPortConfig';
 import SessionTimeout from "../protected/SessionTimeout";
 
 
-export default function BlogDetailsPage() {
+function BlogDetailsPage() {
   const { blogId } = useParams();
 
   const [blogPost, setBlogPost] = useState(null);
@@ -36,12 +36,11 @@ export default function BlogDetailsPage() {
   useEffect(() => {
     const loadUserData = async () => {
       const loggedUserData = await fetchLoggedUserData();
-      console.log('Logged User', loggedUserData);
   
       if (loggedUserData) {
-        console.log(loggedUserData.userId);
-        setLoggedUser(loggedUserData);
-        setLoggedUserId(loggedUserData.userId);
+        setLoggedUser(loggedUserData.user[0]);
+        console.log(loggedUserData.user[0].userId);
+        setLoggedUserId(loggedUserData.user[0].userId);
       } else {
         Swal.fire({
           icon: 'error',
@@ -68,7 +67,7 @@ export default function BlogDetailsPage() {
     }
   }, [blogId]);  
 
-  const fetchBlogData = async (id) => {
+  const fetchBlogData = useCallback(async (id) => {
     setLoading(true);
     try {
       const blogResponse = await axios.get(`${baseURL}/api/blogs/${id}`);
@@ -90,9 +89,9 @@ export default function BlogDetailsPage() {
       console.log(error);
       return;
     }
-  } 
+  }, [blogPost, loading, blogReadTime]); 
 
-  const fetchLikeStateforUsertoBlog = async (idBlog, idUser) => {
+  const fetchLikeStateforUsertoBlog = useCallback(async (idBlog, idUser) => {
     try {
       const userLikeStateForBlogResponse = await axios.get(`${baseURL}/api/blogs/state/${idBlog}/${idUser}`);
       console.log(userLikeStateForBlogResponse.data);
@@ -105,9 +104,9 @@ export default function BlogDetailsPage() {
       console.log(error);
       return;
     }
-  }
+  }, [likedBlog]);
 
-  const fetchBlogLikeCount = async (id) => {
+  const fetchBlogLikeCount = useCallback(async (id) => {
     try {
       const blogLikeCountResponse = await axios.get(`${baseURL}/api/blogs/like-count/${id}`);
       console.log(blogLikeCountResponse.data.likeCount);
@@ -122,9 +121,9 @@ export default function BlogDetailsPage() {
       console.log(error);
       return;
     }
-  }
+  }, [blogLikeCount]);
 
-  const fetchBlogComments = async (id) => {
+  const fetchBlogComments = useCallback(async (id) => {
     try {
       const blogCommentsResponse = await axios.get(`${baseURL}/api/blogs/comments/${id}`);
       console.log(blogCommentsResponse.data.data);
@@ -153,13 +152,13 @@ export default function BlogDetailsPage() {
       console.log(error);
       return;
     }
-  }
+  }, [noOfComments, comments, loadComments]);
 
   const handleLoadComments = () => {
     setLoadBlogComments(true);
   }
 
-  const handleAddComment = async () => {
+  const handleAddComment = useCallback(async () => {
     console.log(comment, loggedUserId, blogId);
 
     if(!comment) {
@@ -201,7 +200,7 @@ export default function BlogDetailsPage() {
       console.log(error);
       return;
     }
-  }
+  }, [comment, loggedUserId, blogId, comments, noOfComments]);
 
   const handleFollowAuthor = () => {
     if(followAuthor == true) {
@@ -224,7 +223,7 @@ export default function BlogDetailsPage() {
     }
   }
 
-  const handleLikeBlog = async () => {
+  const handleLikeBlog = useCallback(async () => {
     if(!loggedUserId || !blogId) {
       toast.error('Something Went Wrong');
       return;
@@ -243,9 +242,9 @@ export default function BlogDetailsPage() {
       console.log(error);
       return;
     }
-  } 
+  }, [loggedUserId, blogId]); 
 
-  const handleDislikeBlog = async () => {
+  const handleDislikeBlog = useCallback(async () => {
     if(!loggedUserId || !blogId) {
       toast.error('Something Went Wrong');
       return;
@@ -264,7 +263,7 @@ export default function BlogDetailsPage() {
       console.log(error);
       return;
     }
-  }
+  }, [loggedUserId, blogId]);
   
   if (loading) {
     return (
@@ -677,3 +676,5 @@ export default function BlogDetailsPage() {
     </div>
   );
 }
+
+export default memo(BlogDetailsPage);

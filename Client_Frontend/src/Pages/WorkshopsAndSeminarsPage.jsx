@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, ArrowRight, Search, Filter, Users, Star, ChevronDown, X, Bookmark, Share2 } from 'lucide-react';
 import baseURL from '../config/axiosPortConfig';
@@ -421,4 +421,4 @@ const WorkshopsAndSeminarsPage = () => {
   );
 };
 
-export default WorkshopsAndSeminarsPage;
+export default memo(WorkshopsAndSeminarsPage);

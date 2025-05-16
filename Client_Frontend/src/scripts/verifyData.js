@@ -23,4 +23,13 @@ const verifyPhoneNumber = (phoneNumber) => {
     return phoneNumberRegex.test(phoneNumber);
 }
 
-export { verifyFacebookURL, verifyLinkedInURL, verifyPassword, verifyEmail, verifyPhoneNumber }
+const verifyURL = (url) => {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+export { verifyFacebookURL, verifyLinkedInURL, verifyPassword, verifyEmail, verifyPhoneNumber, verifyURL }

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { af } from "date-fns/locale";
 
-export default function Contact() {
+function Contact() {
   const [formData, setFormData] = useState({
 
     name: "",
@@ -24,24 +24,17 @@ export default function Contact() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setFormStatus({ ...formStatus, loading: true });
 
-
-
-
-
     try {
-
-
     await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/contact/addinquiry`, formData).then((results) => {
 
         console.log(results);
 
         if (results.status === 201) {
           setFormStatus({ submitted: true, loading: false, error: null });
-
 
           // Reset form after successful submission
           setTimeout(() => {
@@ -77,7 +70,7 @@ export default function Contact() {
       setFormStatus({ submitted: false, loading: false, error: "Failed to submit form. Please try again." });
       console.log("error from try catch ", error);
     }
-  };
+  }, [formStatus, formData]);
 
   return (
 
@@ -416,3 +409,5 @@ export default function Contact() {
     </div>
   );
 }
+
+export default memo(Contact);

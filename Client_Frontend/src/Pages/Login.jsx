@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { AtSign, Lock, ArrowRight } from "lucide-react";
 import axios from "axios";
@@ -7,7 +7,7 @@ import baseURL from "../config/axiosPortConfig";
 import verifyToken from "../scripts/verifyToken.js";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function LoginPage() {
+function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); 
@@ -31,7 +31,7 @@ export default function LoginPage() {
     verifyAccessToken(accessToken);
   }, []);
   
-  const handleLogin = async (e) => {
+  const handleLogin = useCallback(async (e) => {
     e.preventDefault();
     
     if(!email || !password) {
@@ -56,9 +56,9 @@ export default function LoginPage() {
       console.log(error);
       return;
     }
-  };
+  }, [email, password, navigate]);
 
-  const loginViaGmail = async (e) => {
+  const loginViaGmail = useCallback(async (e) => {
     e.preventDefault();
     try {
       const loginViaGmailResponse = await axios.get(`${baseURL}/google/login`);
@@ -71,12 +71,13 @@ export default function LoginPage() {
         toast.error('Something Went Wrong');
       }
     } catch (error) {
+      toast.error('Something Went Wrong');
       console.log(error);
       return;
     }
-  };
+  }, []);
 
-  const loginViaFacebook = async (e) => {
+  const loginViaFacebook = useCallback(async (e) => {
     e.preventDefault();
 
     try {
@@ -88,31 +89,33 @@ export default function LoginPage() {
         window.location.href = loginViaFacebookResponse.data.data; // Redirect to Facebook OAuth ...
       } else {
         toast.error('Something Went Wrong');
+        return;
       }
     } catch (error) {
+      toast.error('Something Went Wrong');
       console.log(error);
       return;
     }
-  } 
+  }, []); 
 
-  const loginViaLinkedIn = async (e) => {
-    e.preventDefault();
+  // const loginViaLinkedIn = useCallback(async (e) => {
+  //   e.preventDefault();
 
-    try {
-      const loginViaLinkedInResponse = await axios.get(`${baseURL}/linkedin/login`);
-      console.log(loginViaLinkedInResponse);
-      if(loginViaLinkedInResponse.status == 200) {
-        console.log(loginViaLinkedInResponse.data);
-        localStorage.setItem('IsUserAuthenticated', true);
-        window.location.href = loginViaLinkedInResponse.data.data; // Redirect to LinkedIn OAuth ...
-      } else {
-        toast.error('Something Went Wrong');
-      }
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }
+  //   try {
+  //     const loginViaLinkedInResponse = await axios.get(`${baseURL}/linkedin/login`);
+  //     console.log(loginViaLinkedInResponse);
+  //     if(loginViaLinkedInResponse.status == 200) {
+  //       console.log(loginViaLinkedInResponse.data);
+  //       localStorage.setItem('IsUserAuthenticated', true);
+  //       window.location.href = loginViaLinkedInResponse.data.data; // Redirect to LinkedIn OAuth ...
+  //     } else {
+  //       toast.error('Something Went Wrong');
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     return;
+  //   }
+  // }, []);
   
   return (
     
@@ -189,9 +192,9 @@ export default function LoginPage() {
             <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 cursor-pointer hover:bg-gray-200">
               <span className="text-lg font-bold text-blue-600" onClick={loginViaFacebook}>F</span>
             </div>
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 cursor-pointer hover:bg-gray-200">
+            {/* <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 cursor-pointer hover:bg-gray-200">
               <span className="text-lg font-bold text-blue-400" onClick={loginViaLinkedIn}>L</span>
-            </div>
+            </div> */}
             <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 cursor-pointer hover:bg-gray-200">
               <span className="text-lg font-bold text-red-500" onClick={loginViaGmail}>G</span>
             </div>
@@ -201,3 +204,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+export default memo(LoginPage);

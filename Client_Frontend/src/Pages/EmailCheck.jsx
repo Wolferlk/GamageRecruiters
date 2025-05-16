@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { AtSign, ArrowRight } from "lucide-react";
@@ -11,7 +11,7 @@ const EmailCheck = () => {
     const [loadResetPassword, setLoadResetPassword] = useState(false);
     const [email, setEmail] = useState('');
 
-    const handleEmailCheck = async (e) => {
+    const handleEmailCheck =  useCallback(async (e) => {
         e.preventDefault();
 
         if(!email) {
@@ -33,7 +33,7 @@ const EmailCheck = () => {
             console.log(error);
             return;
         }
-    }
+    }, [email]);
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 via-indigo-800 to-purple-200">
@@ -79,4 +79,4 @@ const EmailCheck = () => {
     );
 }
 
-export default EmailCheck;
+export default memo(EmailCheck);

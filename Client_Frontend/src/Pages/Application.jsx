@@ -1,12 +1,12 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import Swal from 'sweetalert2';
 import baseURL from "../config/axiosPortConfig";
 import SessionTimeout from "../protected/SessionTimeout";
 
-export default function Application() {
+function Application() {
   // const [applications, setApplications] = useState([
   //   {
   //     id: 1,
@@ -49,7 +49,7 @@ export default function Application() {
 
   }, [jobApplicationId, systemUserId]);
 
-  const fetchJobApplicationData = async (id) => {
+  const fetchJobApplicationData = useCallback(async (id) => {
     try {
       const fetchJobApplicationData = await axios.get(`${baseURL}/api/jobapplications/application/${id}`);
       console.log(fetchJobApplicationData.data);
@@ -72,9 +72,9 @@ export default function Application() {
       console.log(error);
       return;
     }
-  } 
+  }, [currentViewedJobApplication, systemUserId, currentCV, firstName, lastName, email, phoneNumber]); 
 
-  const viewCurrentCV = () => {
+  const viewCurrentCV = useCallback(() => {
     console.log(currentCV);
     let cvLink
     const patternRelatedToPath = 'uploads\\appliedJobs\\resumes\\';
@@ -85,9 +85,9 @@ export default function Application() {
     }
     console.log(cvLink);
     window.open(cvLink, '_blank');
-  }
+  }, [currentCV]);
 
-  const fetchAllJobApplicationsRelatedToUser = async (id) => {
+  const fetchAllJobApplicationsRelatedToUser = useCallback(async (id) => {
     try {
       const fetchUserJobApplicationsData = await axios.get(`${baseURL}/api/jobapplications/applications/user/${id}`);
       console.log(fetchUserJobApplicationsData.data);
@@ -102,17 +102,17 @@ export default function Application() {
       console.log(error);
       return;
     }
-  } 
+  }, [applications]);
 
-  const handleResume = (e) => {
+  const handleResume = useCallback((e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setResume(selectedFile); 
       // setCVSelected(true);
     }
-  }
+  }, [resume]);
 
-  const updateJobApplication = async () => {
+  const updateJobApplication = useCallback(async () => {
     if(!jobApplicationId) {
       toast.error('Error Occured While Updating Job Application');
       return;
@@ -165,9 +165,9 @@ export default function Application() {
         }
       }
     });
-  } 
+  }, [firstName, lastName, email, phoneNumber, resume]); 
 
-  const removeJobApplication = () => {
+  const removeJobApplication = useCallback(() => {
     if(!jobApplicationId) {
       toast.error('Error Occured While Updating Job Application');
       return;
@@ -208,7 +208,7 @@ export default function Application() {
         }
       }
     });
-  }
+  }, [jobApplicationId]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -323,3 +323,5 @@ export default function Application() {
     </div>
   );
 }
+
+export default memo(Application);

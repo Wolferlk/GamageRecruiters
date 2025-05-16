@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { 
@@ -19,11 +19,11 @@ import {
 } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import VerifyEmail from "./VerifyEmail";
-import { verifyEmail, verifyFacebookURL, verifyLinkedInURL, verifyPassword, verifyPhoneNumber } from "../scripts/verifyData";
+import { verifyEmail, verifyFacebookURL, verifyLinkedInURL, verifyPassword, verifyPhoneNumber, verifyURL } from "../scripts/verifyData";
 import baseURL from "../config/axiosPortConfig";
 
 
-export default function SignupPage() {
+function SignupPage() {
 
   const [loadUI, setLoadUI] = useState(true);
   const [firstName, setFirstName] = useState('');
@@ -53,7 +53,7 @@ export default function SignupPage() {
   const totalSteps = 5;
   const [passwordError, setPasswordError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     
     if(!firstName || !lastName || !email || !password || !confirmPassword || !birthDate || !gender || !profileDescription) {
@@ -79,19 +79,30 @@ export default function SignupPage() {
       toast.error('Invalid Phone Number');
     } 
 
-    if(linkedInLink || facebookLink || phoneNumber2) {
-      if(!verifyFacebookURL(facebookLink)) {
-        toast.error('Invalid Facebook URL');
-        return;
-      }
-  
+    if(linkedInLink) {
       if(!verifyLinkedInURL(linkedInLink)) {
         toast.error('Invalid LinkedIn URL');
         return;
       } 
-      
+    }
+
+    if(facebookLink) {
+      if(!verifyFacebookURL(facebookLink)) {
+        toast.error('Invalid Facebook URL');
+        return;
+      }
+    }
+
+    if(phoneNumber2) {  
       if(!verifyPhoneNumber(phoneNumber2)) {
         toast.error('Invalid Phone Number');
+      }
+    }
+
+    if(portfolioLink) {
+      if(!verifyURL(portfolioLink)) {
+        toast.error('Invalid Portfolio URL');
+        return;
       }
     }
 
@@ -140,7 +151,7 @@ export default function SignupPage() {
       console.log(error);
       return;
     }
-  };
+  }, [firstName, lastName, gender, email, password, confirmPassword, profileDescription]);
 
   // const handleFileChange = (e) => {
   //   console.log(e.target.files);
@@ -150,17 +161,17 @@ export default function SignupPage() {
   //   });
   // };
 
-  const handleCVChange = (e) => {
+  const handleCVChange = useCallback((e) => {
     console.log(e.target.files[0]);
     setCV(e.target.files[0]);
     setCVName(e.target.files[0].name);
-  };
+  }, [cv, cvName]);
 
-  const handlePhotoChange = (e) => {
+  const handlePhotoChange = useCallback((e) => {
     console.log(e.target.files[0]);
     setPhoto(e.target.files[0]);
     setPhotoName(e.target.files[0].name);
-  };
+  }, [photo, photoName]);
 
   const handleInputChange = (e) => {
     if (e.target.name === 'confirmPassword' || e.target.name === 'password') {
@@ -173,7 +184,7 @@ export default function SignupPage() {
     //   ...formData,
     //   [e.target.name]: e.target.value
     // });
-  };
+  }
 
   const nextStep = () => {
     if (currentStep === 4 && password !== confirmPassword) {
@@ -181,7 +192,7 @@ export default function SignupPage() {
       return;
     }
     setCurrentStep(Math.min(currentStep + 1, totalSteps));
-  };
+  }
 
   const prevStep = () => {
     setCurrentStep(Math.max(currentStep - 1, 1));
@@ -678,3 +689,5 @@ export default function SignupPage() {
     </div>
   );
 }
+
+export default memo(SignupPage);

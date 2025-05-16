@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Briefcase } from "lucide-react";
 import { toast, ToastContainer } from 'react-toastify';
@@ -50,7 +50,7 @@ const AppliedJobs = ({ user }) => {
     fetchAppliedJobs(user.userId);
   }, [user]);
 
-  const fetchAppliedJobs = async (id) => {
+  const fetchAppliedJobs = useCallback(async (id) => {
     if(!id) {
       toast.error('Error Occured While Loading Applied Jobs');
       return;
@@ -72,7 +72,7 @@ const AppliedJobs = ({ user }) => {
       toast.error('Error Occured While Loading Applied Jobs');
       return;
     }
-  }
+  }, [appliedJobs, appliedJobCount]);
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
@@ -137,4 +137,4 @@ const AppliedJobs = ({ user }) => {
   );
 };
 
-export default AppliedJobs;
+export default memo(AppliedJobs);

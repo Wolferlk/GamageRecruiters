@@ -2,10 +2,10 @@ import axios from "axios";
 import baseURL from "../config/axiosPortConfig";
 
 const verifyToken = async (token) => {
-    console.log(token);
+    // console.log(token);
     try {
         const response = await axios.get(`${baseURL}/session/handle-token/${token}`);
-        console.log(response.data);
+        // console.log(response.data);
         if (response.data === 'Token is Valid') {
             // console.log('Token is valid', response.data);
             return 'Token is Valid';

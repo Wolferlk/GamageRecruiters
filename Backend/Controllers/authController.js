@@ -112,12 +112,15 @@ async function sendEmailVerificationOTP (req, res) {
         return res.status(400).send('Email is required');
     }
 
+    console.log(email);
+
     try {
         const otp = generateOTP();
         otpCache[email] = otp;
 
         // Send the email ...
         sendOTP(email, otp);
+        console.log(otp);
         res.cookie('otpCache', otpCache, { maxAge: 3000, httpOnly: true });
         res.status(200).json({message: "OTP sent successfully", otp: otp});
     } catch (error) {
@@ -132,6 +135,8 @@ async function verifyEmailVerificationOTP (req, res) {
     if(!otp || !oldEmail || !email) {
         return res.status(400).send('Something went wrong with required data');
     }
+
+    console.log(otp, oldEmail, email);
  
     try {
         // Check if email exists in the cache ...

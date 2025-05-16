@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PartnersGrid from '../components/Patners/PartnersGrid';
@@ -260,4 +260,4 @@ const TrustedPartnersPage = () => {
   );
 };
 
-export default TrustedPartnersPage;
+export default memo(TrustedPartnersPage);

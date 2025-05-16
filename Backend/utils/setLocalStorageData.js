@@ -1,5 +1,17 @@
 const { localStorage, encryptData, decryptData } = require('../utils/localStorage');
 
+function setFrontendApplicationRunningURL (url) {
+    const key = "Saved Frontend Application URL";
+                
+    // Encrypt the URL (convert it to a JSON string first) ...
+    const { encryptedData, iv } = encryptData(JSON.stringify(url));
+                
+    // Store encrypted data and IV in localStorage ...
+    localStorage.setItem(key, JSON.stringify({ encryptedData, iv }));
+    
+    return 'success';
+}
+
 function setLoggedUserIdAndMethod (id, method) {
     const key = "Saved User Data";
     const userData = [id, method];
@@ -25,4 +37,4 @@ function setLoggedPlatformUserRegisteredId (id) {
     return 'success';
 } 
 
-module.exports = { setLoggedUserIdAndMethod, setLoggedPlatformUserRegisteredId }
+module.exports = { setFrontendApplicationRunningURL, setLoggedUserIdAndMethod, setLoggedPlatformUserRegisteredId }

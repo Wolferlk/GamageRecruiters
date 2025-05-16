@@ -3,6 +3,7 @@ const { pool } = require('../config/dbConnection');
 const { setLoggedUserIdAndMethod } = require('../utils/setLocalStorageData');
 const { addNewUserIfSessionUserNotFound, generateNewTokenForPlatformLogins } = require('../middlewares/userMiddleware');
 const splitStrings = require('../utils/splitStrings');
+const { fetchFrontendApplicationRunningURL } = require('../utils/retrieveLocalStorageData');
 
 dotenv.config();
 
@@ -20,8 +21,10 @@ async function loginFacebookCallback (req, res) {
     try {
         // Store user in session ...
         req.session.user = req.user; 
-        
         // console.log("User stored in session:", req.session.user);
+
+        // Fetch the URL from localStorage ...
+        const url = fetchFrontendApplicationRunningURL();
 
         const sql = 'INSERT INTO LoginsThroughPlatforms (accountId, photo, name, email, loggedAt, platform) VALUES (?, ?, ?, ?, ?, ?)';
         const values = [req.session.user.id, req.session.user.photo, req.session.user.name, req.session.user.email, new Date(), 'Facebook'];
@@ -55,7 +58,7 @@ async function loginFacebookCallback (req, res) {
                             return res.status(404).send('Error Occured. Cannot proceed.');
                         }
 
-                        return res.redirect(process.env.SUCCESS_REDIRECT_URL);
+                        return res.redirect(`${url}/dashboard`);
                     } catch (error) {
                         console.error(error);
                         return res.status(500).send(error);
@@ -72,7 +75,7 @@ async function loginFacebookCallback (req, res) {
                 }
                 
                 // Redirect to frontend after setting session and save data ...
-                return res.redirect(process.env.SUCCESS_REDIRECT_URL);
+                return res.redirect(`${url}/dashboard`);
             });
         });
     } catch (error) {

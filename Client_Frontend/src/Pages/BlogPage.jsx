@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useChangeDateFormat } from '../hooks/customHooks';
@@ -38,7 +38,7 @@ import baseURL from '../config/axiosPortConfig';
 
 const categories = ['All', 'Industry Trends', 'Career Advice', 'HR Insights', 'Market News'];
 
-export default function BlogPage() {
+function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [blogPosts, setBlogPosts] = useState([]);
   const [email, setEmail] = useState('');
@@ -47,7 +47,7 @@ export default function BlogPage() {
     fetchBlogPages();
   }, [])
 
-  const fetchBlogPages = async () => {
+  const fetchBlogPages = useCallback(async () => {
     try {
       const fetchBlogsResponse = await axios.get(`${baseURL}/api/blogs`);
       console.log(fetchBlogsResponse.data);
@@ -65,7 +65,7 @@ export default function BlogPage() {
       console.log(error);
       return;
     }
-  } 
+  }, [blogPosts]); 
 
   const handleSubscribe = async () => {
     if(!email) {
@@ -84,6 +84,7 @@ export default function BlogPage() {
       if(subscribeToNewsLetterResponse.status == 200) {
         toast.success('Subscribed to NewsLetter Successfully');
         setEmail('');
+        return;
       } else {
         toast.error('An error occured. Please try again');
         return;
@@ -205,3 +206,5 @@ export default function BlogPage() {
     </div>
   );
 }
+
+export default memo(BlogPage);

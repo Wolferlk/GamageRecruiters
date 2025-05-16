@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
@@ -47,7 +47,7 @@ import SessionTimeout from "../protected/SessionTimeout";
 //   // Add more job listings as needed
 // ];
 
-export default function JobDetails() {
+function JobDetails() {
   const { jobId } = useParams();
   const [job, setJob] = useState(null);
   // const job = jobs.find((job) => job.id === parseInt(jobId));
@@ -68,14 +68,15 @@ export default function JobDetails() {
     fetchJobData(jobId);
   }, [jobId])
 
-  const fetchJobData = async (id) => {
+  const fetchJobData = useCallback(async (id) => {
 
     if(!id) {
       toast.error('Error Occured');
+      return;
     }
 
     try {
-      const fetchDataByIdResponse = await axios.get(`${baseURL}/api/jobs/${jobId}`);
+      const fetchDataByIdResponse = await axios.get(`${baseURL}/api/jobs/${id}`);
       // console.log(fetchDataByIdResponse.data);
       if(fetchDataByIdResponse.status == 200) {
         setJob(fetchDataByIdResponse.data.data);
@@ -88,17 +89,17 @@ export default function JobDetails() {
       console.log(error.message);
       return;
     }
-  }
+  }, []);
 
-  const handleCVChange = (e) => {
+  const handleCVChange = useCallback((e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       console.log("Selected CV:", selectedFile);
       setCV(selectedFile);
     }
-  } 
+  }, []); 
   
-  const handleApplyJob = async (e) => {
+  const handleApplyJob = useCallback(async (e) => {
     e.preventDefault();
 
     if(!firstName || !lastName || !email || !phoneNumber) {
@@ -164,11 +165,11 @@ export default function JobDetails() {
       console.log(error);
       return;
     }
-  }
+  }, [navigate, firstName, lastName, email, phoneNumber, cv, job]);
 
-  const moveBack = () => {
+  const moveBack = useCallback(() => {
     navigate('/jobs');
-  }
+  }, [navigate]);
 
   if (!job) {
     return (
@@ -372,3 +373,5 @@ export default function JobDetails() {
     </div>
   );
 }
+
+export default memo(JobDetails);

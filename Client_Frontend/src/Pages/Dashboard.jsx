@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { 
   User, Briefcase, Edit3, Settings,
   ChevronRight, Shield, Award, Bell, 
@@ -103,7 +103,7 @@ const AnimatedCard = ({ children, delay = 0 }) => {
 };
 
 // Main Dashboard Component
-export default function Dashboard() {
+function Dashboard() {
   const [userStatus, setUserStatus] = useState("Active");
   const [notifications, setNotifications] = useState(0);
   const [isFirstVisit, setIsFirstVisit] = useState(true);
@@ -237,7 +237,7 @@ export default function Dashboard() {
 
     if(user.cv) {
       const cvURL = `${baseURL}/uploads/cvs/${user.cv}`;
-      console.log('cv-url', cvURL);
+      // console.log('cv-url', cvURL);
       setCVLink(cvURL);
     } else {
       setCVLink('');
@@ -245,7 +245,7 @@ export default function Dashboard() {
 
     if(user.photo) {
       const photoURL = `${baseURL}/uploads/images/${user.photo}`;
-      console.log('image-url', photoURL);
+      // console.log('image-url', photoURL);
       setImageLink(photoURL);
     } else {
       setImageLink('');
@@ -387,16 +387,16 @@ export default function Dashboard() {
     );
   }; 
 
-  const fetchLoggedUserData = async () => {
+  const fetchLoggedUserData = useCallback (async () => {
       try {
         // const loggedUserResponse = await axios.get('http://localhost:8000/session/profile-data', { headers: { 'authorization': `Bearer ${accessToken}` }});
         const loggedUserResponse = await axios.get(`${baseURL}/session/profile-data`);
-        console.log(loggedUserResponse.data);
+        // console.log(loggedUserResponse.data);
         // console.log(loggedUserResponse.data.data[0]);
         if(loggedUserResponse.status === 200) {
           setUser(loggedUserResponse.data.data.user[0]);
           setLoggedUserId(loggedUserResponse.data.data.user[0].userId);
-          console.log(loggedUserResponse.data.data.token);
+          // console.log(loggedUserResponse.data.data.token);
           setAccessToken(loggedUserResponse.data.data.token);
           const percentage = useSetUserProfileCompletion(loggedUserResponse.data.data.user[0]);
           setProfileCompletionPercentage(percentage);
@@ -444,9 +444,9 @@ export default function Dashboard() {
         console.log(error);
         return;
       }
-  }
+  }, [user, loggedUserId, accessToken, profileCompletionPercentage])
 
-  const fetchAppliedJobCount = async (id) => {
+  const fetchAppliedJobCount = useCallback (async (id) => {
     try {
       const countResponse = await axios.get(`${baseURL}/api/jobs/applied/count/${id}`);
       // console.log(countResponse.data);
@@ -461,9 +461,9 @@ export default function Dashboard() {
       console.log(error);
       return;
     }
-  } 
+  }, [notifications]); 
 
-  const fetchJobApplicationStatusForUser = async (id) => {
+  const fetchJobApplicationStatusForUser = useCallback (async (id) => {
     try {
       const jobApplicationStatusResponse = await axios.get(`${baseURL}/user/application-status/${id}`);
       // console.log(jobApplicationStatusResponse.data);
@@ -485,9 +485,9 @@ export default function Dashboard() {
       console.error(error);
       return;
     }
-  }
+  }, [jobStatus, jobData]);
 
-  const fetchLastActiveStatusForUser = async (id) => {
+  const fetchLastActiveStatusForUser = useCallback (async (id) => {
     try {
       const lastActiveStatusResponse = await axios.get(`${baseURL}/user/last-active-status/${id}`);
       // console.log(lastActiveStatusResponse.data);
@@ -503,9 +503,9 @@ export default function Dashboard() {
       console.error(error);
       return;
     }
-  }
+  }, [lastActive]);
 
-  const fetchLastProfileActivity = async (id) => {
+  const fetchLastProfileActivity = useCallback (async (id) => {
     try {
       const recentActivityResponse = await axios.get(`${baseURL}/user/recent-activity/${id}`);
       // console.log(recentActivityResponse.data);
@@ -532,9 +532,9 @@ export default function Dashboard() {
       console.error(error);
       return;
     }
-  }
+  }, [lastProfileActivity, lastProfileActivityTime]);
 
-  const fetchUserLoginAttempts = async (id) => {
+  const fetchUserLoginAttempts = useCallback (async (id) => {
     try {
       const userLoginAttemptsResponse = await axios.get(`${baseURL}/session/login-attempts/${id}`);
       // console.log(userLoginAttemptsResponse.data);
@@ -553,7 +553,7 @@ export default function Dashboard() {
       console.error(error);
       return;
     }
-  }
+  }, [isFirstVisit]);
   
   return (
     <div className="bg-gradient-to-br from-gray-50 to-indigo-50 min-h-screen p-4 md:p-6 transition-all duration-300">
@@ -800,7 +800,7 @@ export default function Dashboard() {
                 )}
               </div>
               
-              <div className="flex">
+              {/* <div className="flex">
                 <div className="mr-4 flex flex-col items-center">
                   <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">
                     <Eye size={18} />
@@ -814,7 +814,7 @@ export default function Dashboard() {
                   </div>
                   <p className="text-sm text-gray-600 mt-1">Your profile was viewed by a recruiter from DataSys International.</p>
                 </div>
-              </div>
+              </div> */}
               
               <div className="flex">
                 <div className="mr-4 flex flex-col items-center">
@@ -873,4 +873,6 @@ export default function Dashboard() {
       `}</style>
     </div>
   );
-}
+} 
+
+export default memo(Dashboard);

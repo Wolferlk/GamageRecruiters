@@ -101,6 +101,7 @@ export default function Home() {
     // localStorage.clear();
     loadLatestJobs();
     loadEvents();
+    captureURL();
     // Generate a unique random color for each job ...
     const colors = latestJobs.map(() => generateRandomColor());
     console.log(colors);
@@ -287,6 +288,26 @@ export default function Home() {
       } else {
         toast.error('Error Loading Events');
         console.log(response.statusText);
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  }
+
+  const captureURL = async () => {
+    const url = window.location.origin;
+    console.log(url);
+
+    try {
+      const response = await axios.post(`${baseURL}/url`, { url: url });
+      console.log(response);
+      if (response.status == 200) {
+        console.log('url capturing successfull');
+        return;
+      } else {
+        console.log('url capturing failed');
         return;
       }
     } catch (error) {

@@ -1,5 +1,23 @@
 const { localStorage, decryptData } = require('../utils/localStorage');
 
+function fetchFrontendApplicationRunningURL () {
+    const key = 'Saved Frontend Application URL';
+
+    // Retrieve encrypted data from localStorage ...
+    const storedURL = localStorage.getItem(key);
+
+    if(!storedURL) {
+        console.log(`No data found for key: ${key}`);
+        return 'No data found. Error Occured.';
+    } 
+
+    const { encryptedData, iv } = JSON.parse(storedURL); // Parse stored JSON ...
+    const decryptedData = decryptData(encryptedData, iv); // Decrypt data ...
+    const retrievedURL = JSON.parse(decryptedData); // Convert string back to array ...
+    
+    return retrievedURL;
+}
+
 function fetchLoggedUserIdAndMethod () {
     const key = 'Saved User Data';
 
@@ -35,4 +53,4 @@ function fetchLoggedPlatformUserRegisteredId () {
     return retrieveduserId;
 } 
 
-module.exports = { fetchLoggedUserIdAndMethod, fetchLoggedPlatformUserRegisteredId }
+module.exports = { fetchFrontendApplicationRunningURL, fetchLoggedUserIdAndMethod, fetchLoggedPlatformUserRegisteredId }

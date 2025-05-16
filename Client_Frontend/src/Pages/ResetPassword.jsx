@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import axios from 'axios';
@@ -19,7 +19,7 @@ const ResetPassword = ({ email }) => {
         setUserEmail(email);
     }, [email]);
 
-    const handlePasswordReset = async (e) => {
+    const handlePasswordReset = useCallback(async (e) => {
         e.preventDefault();
 
         if(!password || !confirmPassword) {
@@ -53,10 +53,11 @@ const ResetPassword = ({ email }) => {
                 return;
             }
         } catch (error) {
+            toast.error('Password Reset Failed');
             console.log(error);
             return;
         }
-    }
+    }, [password, confirmPassword]);
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 via-indigo-800 to-purple-200">
@@ -114,4 +115,4 @@ const ResetPassword = ({ email }) => {
     );
 }
 
-export default ResetPassword;
+export default memo(ResetPassword);
