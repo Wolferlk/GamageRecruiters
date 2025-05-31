@@ -143,6 +143,12 @@ function Workshops() {
     exit: { opacity: 0, y: -20, transition: { duration: 0.3 } }
   };
 
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "https://via.placeholder.com/400x200?text=Workshop";
+    if (imagePath.startsWith('http')) return imagePath;
+    return `http://localhost:8000/uploads/workshops/images/${imagePath}`;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -312,17 +318,17 @@ function Workshops() {
                       <div className="relative h-48 overflow-hidden rounded-t-xl">
                         {workshop.image ? (
                           <img 
-                            src={workshop.image} 
+                            src={getImageUrl(workshop.image)} 
                             alt={workshop.title}
                             className="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
                             onError={(e) => {
                               e.target.onerror = null;
-                              e.target.src = "/api/placeholder/400/200";
+                              e.target.src = "https://via.placeholder.com/400x200?text=Workshop";
                             }}
                           />
                         ) : (
-                          <img 
-                            src="/api/placeholder/400/200" 
+                          <img  
+                            src="https://via.placeholder.com/400x200?text=Workshop" 
                             alt="Workshop placeholder" 
                             className="w-full h-full object-cover"
                           />
