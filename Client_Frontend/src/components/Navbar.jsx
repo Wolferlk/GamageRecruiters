@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navigation = [
@@ -26,6 +26,7 @@ export default function Navbar({ fixedColor }) {
   const [activeLink, setActiveLink] = useState('/');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
+  const location = useLocation();
   // Detect scroll position for navbar background change
   useEffect(() => {
     const handleScroll = () => {
@@ -39,26 +40,33 @@ export default function Navbar({ fixedColor }) {
 
   useEffect(() => {
     // Set active link based on current path
-    setActiveLink(window.location.pathname);
-  }, []);
+    setActiveLink(location.pathname);
+  }, [location.pathname]);
 
   useEffect(() => {
     let scrollY = 0;
+    const isDashboardPage = location.pathname === '/dashboard';
 
     if (mobileMenuOpen) {
-      scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.left = '0';
-      document.body.style.right = '0';
-      document.body.style.overflow = 'hidden';
-      document.body.style.width = '100%';
+      if (isDashboardPage) { // <--- Start of new conditional logic
+        document.body.style.overflow = 'hidden';
+      } else {
+        scrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.overflow = 'hidden';
+        document.body.style.width = '100%';
+      } // <--- End of new conditional logic
     } else {
-      // Only restore scroll if we are on the same page
-      const scrollYValue = document.body.style.top;
-      if (scrollYValue) {
-        const restoreScrollY = parseInt(scrollYValue || '0') * -1;
-        window.scrollTo(0, restoreScrollY);
+      // Only restore scroll if we are on the same page AND NOT on the dashboard
+      if (!isDashboardPage) { // <--- Add this condition
+        const scrollYValue = document.body.style.top;
+        if (scrollYValue) {
+          const restoreScrollY = parseInt(scrollYValue || '0') * -1;
+          window.scrollTo(0, restoreScrollY);
+        }
       }
 
       // Clear lock styles
@@ -69,7 +77,7 @@ export default function Navbar({ fixedColor }) {
       document.body.style.overflow = '';
       document.body.style.width = '';
     }
-  }, [mobileMenuOpen]);
+  }, [mobileMenuOpen, location.pathname]);
 
   return (
     <motion.header 
