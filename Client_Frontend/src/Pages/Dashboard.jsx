@@ -144,67 +144,78 @@ function Dashboard() {
   // });
   
   // Enhanced applied jobs data
-  const [appliedJobs, setAppliedJobs] = useState([
-    {
-      id: "j001",
-      title: "Senior Frontend Developer",
-      company: "TechCorp Solutions",
-      companyLogo: "/api/placeholder/48/48",
-      location: "Colombo",
-      salary: "$80,000 - $95,000",
-      type: "Full-time",
-      appliedDate: "2025-02-28",
-      status: "Interview Scheduled",
-      statusColor: "bg-green-100 text-green-800",
-      interviewDate: "2025-03-15",
-      description: "Leading frontend development for enterprise applications...",
-      nextSteps: "Prepare for technical interview scheduled on March 15th",
-      viewCount: 5
-    },
-    {
-      id: "j002",
-      title: "Full Stack Engineer",
-      company: "DataSys International",
-      companyLogo: "/api/placeholder/48/48",
-      location: "Remote",
-      salary: "$75,000 - $90,000",
-      type: "Contract",
-      appliedDate: "2025-02-15",
-      status: "Application Viewed",
-      statusColor: "bg-blue-100 text-blue-800",
-      viewCount: 3
-    },
-    {
-      id: "j003",
-      title: "UX/UI Designer",
-      company: "Creative Minds",
-      companyLogo: "/api/placeholder/48/48",
-      location: "Kandy",
-      salary: "$65,000 - $80,000",
-      type: "Part-time",
-      appliedDate: "2025-01-30",
-      status: "Rejected",
-      statusColor: "bg-red-100 text-red-800",
-      feedback: "Selected a candidate with more industry-specific experience",
-      viewCount: 1
-    }
-  ]);
-  
+  // const [appliedJobs, setAppliedJobs] = useState([
+  //   {
+  //     id: "j001",
+  //     title: "Senior Frontend Developer",
+  //     company: "TechCorp Solutions",
+  //     companyLogo: "/api/placeholder/48/48",
+  //     location: "Colombo",
+  //     salary: "$80,000 - $95,000",
+  //     type: "Full-time",
+  //     appliedDate: "2025-02-28",
+  //     status: "Interview Scheduled",
+  //     statusColor: "bg-green-100 text-green-800",
+  //     interviewDate: "2025-03-15",
+  //     description: "Leading frontend development for enterprise applications...",
+  //     nextSteps: "Prepare for technical interview scheduled on March 15th",
+  //     viewCount: 5
+  //   },
+  //   {
+  //     id: "j002",
+  //     title: "Full Stack Engineer",
+  //     company: "DataSys International",
+  //     companyLogo: "/api/placeholder/48/48",
+  //     location: "Remote",
+  //     salary: "$75,000 - $90,000",
+  //     type: "Contract",
+  //     appliedDate: "2025-02-15",
+  //     status: "Application Viewed",
+  //     statusColor: "bg-blue-100 text-blue-800",
+  //     viewCount: 3
+  //   },
+  //   {
+  //     id: "j003",
+  //     title: "UX/UI Designer",
+  //     company: "Creative Minds",
+  //     companyLogo: "/api/placeholder/48/48",
+  //     location: "Kandy",
+  //     salary: "$65,000 - $80,000",
+  //     type: "Part-time",
+  //     appliedDate: "2025-01-30",
+  //     status: "Rejected",
+  //     statusColor: "bg-red-100 text-red-800",
+  //     feedback: "Selected a candidate with more industry-specific experience",
+  //     viewCount: 1
+  //   }
+  // ]);
+  const [appliedJobs, setAppliedJobs] = useState([]);
+
   // Job recommendations
-  const [jobRecommendations, setJobRecommendations] = useState([
-    {
-      id: "rec001",
-      title: "React Developer",
-      company: "InnoTech Solutions",
-      matchPercentage: 92
-    },
-    {
-      id: "rec002",
-      title: "Frontend Team Lead",
-      company: "Global Systems Inc.",
-      matchPercentage: 87
+  // Job recommendations
+  const [jobRecommendations, setJobRecommendations] = useState([]);
+  const [jobRecPage, setJobRecPage] = useState(1);
+  const JOBS_PER_PAGE = 2;
+
+  const fetchJobRecommendations = useCallback(async (page = 1) => {
+    try {
+      const response = await axios.get(`${baseURL}/api/jobs`, { withCredentials: true });
+      if (response.status === 200 && Array.isArray(response.data.jobs)) {
+        // Paginate jobs
+        const start = 0;
+        const end = page * JOBS_PER_PAGE;
+        setJobRecommendations(response.data.jobs.slice(start, end));
+      } else {
+        setJobRecommendations([]);
+      }
+    } catch (error) {
+      setJobRecommendations([]);
     }
-  ]);
+  }, []);
+
+  useEffect(() => {
+    fetchJobRecommendations(jobRecPage);
+  }, [jobRecPage, fetchJobRecommendations]);
   
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -716,19 +727,28 @@ function Dashboard() {
                     <h4 className="text-sm font-medium text-gray-800 mb-3">Job Matches</h4>
                     {jobRecommendations.map(job => (
                       <div 
-                        key={job.id}
+                        key={job.jobId} // was job.id
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer mb-2 border border-gray-100"
+                        onClick={() => navigate(`/jobs/${job.jobId}`)} // was job.id
                       >
-                        <div className="min-w-8 w-8 h-8 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                          {job.matchPercentage}%
+                        <div className="min-w-8 w-9 h-9 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 p-1">
+                          <div className="font-medium text-xs text-center leading-tight">
+                            {job.jobType || "Job"}
+                          </div>
                         </div>
                         <div className="overflow-hidden">
-                          <div className="font-medium text-sm truncate">{job.title}</div>
+                          <div className="font-medium text-sm truncate">{job.jobName}</div>
                           <div className="text-xs text-gray-500 truncate">{job.company}</div>
                         </div>
                         <ChevronRight size={16} className="ml-auto text-gray-400" />
                       </div>
                     ))}
+                    <button
+                      className="mt-2 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-1 rounded transition"
+                      onClick={() => navigate('/jobs')}
+                    >
+                      More
+                    </button>
                   </div>
                 </div>
               </div>
