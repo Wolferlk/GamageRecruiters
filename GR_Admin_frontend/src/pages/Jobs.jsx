@@ -26,6 +26,7 @@ function Jobs() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedJob, setEditedJob] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const clientBaseUrl = import.meta.env.VITE_CLIENT_BASE_URL;
 
   // Fetch jobs data from API
   useEffect(() => {
@@ -518,7 +519,16 @@ function Jobs() {
                       }`}>
                       View Details
                     </button>
-                    
+                    <button
+                      onClick={() => window.open(`${clientBaseUrl}/jobs/${job.jobId}`, '_blank')}
+                      className={`py-1.5 px-3 rounded text-sm font-medium ${
+                        isDarkMode
+                          ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                          : 'bg-blue-100 hover:bg-blue-200 text-blue-700'
+                      } ml-2`}
+                    >
+                      Public View
+                    </button>
                     <div className="flex space-x-1">
                       <button 
                         onClick={() => handleEditJob(job.jobId)}
