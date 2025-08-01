@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import axios from "axios";
@@ -156,6 +156,11 @@ function JobListings() {
     return 0;
   });
 
+  // Always show the latest 10 jobs in the carousel, regardless of filters
+  const latestJobs = [...jobs]
+    .sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate))
+    .slice(0, 10);
+
   // Clear all filters
   const clearFilters = () => {
     setSearchTerm('');
@@ -271,6 +276,43 @@ function JobListings() {
     );
   };
 
+  // Carousel state
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const carouselRef = useRef(null);
+  const visibleCount = 3; // Always show 3 jobs
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!latestJobs.length) return;
+    const interval = setInterval(() => {
+      setCarouselIndex(prev =>
+        prev + 1 > latestJobs.length - 3 ? 0 : prev + 1
+      );
+    }, 3000);
+    carouselRef.current = interval;
+    return () => clearInterval(interval);
+  }, [latestJobs.length]);
+
+  // Manual navigation
+  const handlePrev = () => {
+    setCarouselIndex(prev =>
+      prev - 1 < 0 ? Math.max(latestJobs.length - 3, 0) : prev - 1
+    );
+  };
+  const handleNext = () => {
+    setCarouselIndex(prev =>
+      prev + 1 > latestJobs.length - 3 ? 0 : prev + 1
+    );
+  };
+
+  // Pause auto-scroll on hover
+  const pauseAutoScroll = () => {
+    if (carouselRef.current) clearInterval(carouselRef.current);
+  };
+  const resumeAutoScroll = () => {
+    // handled by useEffect
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <ToastContainer position="top-center" />
@@ -371,6 +413,58 @@ function JobListings() {
             </div>
           </div>
         </section>
+
+        {/* Job Carousel Section */}
+        {latestJobs.length > 0 && (
+          <div className="w-full mt-8 relative flex items-center justify-center">
+            {/* Left Arrow */}
+            <button
+              onClick={handlePrev}
+              className="absolute left-0 z-10 -translate-x-1/2 top-1/2 -translate-y-1/2 p-3 bg-white border border-gray-200 shadow-md rounded-full hover:bg-gray-100 transition"
+              aria-label="Previous"
+              style={{ boxShadow: '0 2px 8px 0 rgba(0,0,0,0.06)' }}
+            >
+              <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            {/* Carousel Content */}
+            <div className="bg-white py-8 mb-8 rounded-lg shadow-sm border border-gray-100 max-w-7xl w-full mx-auto px-6 lg:px-8 overflow-hidden">
+              <div
+                className="flex transition-transform duration-500"
+                style={{
+                  width: '100%',
+                  transform: `translateX(-${carouselIndex * (100 / 3)}%)`
+                }}
+                onMouseEnter={pauseAutoScroll}
+                onMouseLeave={resumeAutoScroll}
+              >
+                {latestJobs.map((job, idx) => (
+                  <div
+                    key={job.jobId || idx}
+                    className="px-3"
+                    style={{ minWidth: '33.3333%', maxWidth: '33.3333%', flex: '0 0 33.3333%' }}
+                  >
+                    <div className="bg-gradient-to-tr from-blue-100 to-white rounded-2xl h-full p-0.5">
+                      <EnhancedJobCard job={job} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Right Arrow */}
+            <button
+              onClick={handleNext}
+              className="absolute right-0 z-10 translate-x-1/2 top-1/2 -translate-y-1/2 p-3 bg-white border border-gray-200 shadow-md rounded-full hover:bg-gray-100 transition"
+              aria-label="Next"
+              style={{ boxShadow: '0 2px 8px 0 rgba(0,0,0,0.06)' }}
+            >
+              <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        )}
 
         {/* Featured jobs section */}
         {featuredJobs.length > 0 && !isLoading && (
