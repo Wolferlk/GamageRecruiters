@@ -1,33 +1,33 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from 'axios';
-import baseURL from '../config/axiosPortConfig';
-import { verifyEmail } from '../scripts/verifyData';
+import axios from "axios";
+import baseURL from "../config/axiosPortConfig";
+import { verifyEmail } from "../scripts/verifyData";
 
 const navigation = {
   main: [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Services', href: '/services' },
-    { name: 'Jobs', href: '/jobs' },
-    { name: 'Trusted Partners', href: '/trusted-partners' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Workshops', href: '/workshop' },
-    { name: 'Contact', href: '/contact' },
-    { name: 'Subsidiaries', href: '/subsidiaries' },
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Services", href: "/services" },
+    { name: "Jobs", href: "/jobs" },
+    { name: "Trusted Partners", href: "/trusted-partners" },
+    { name: "Blog", href: "/blog" },
+    { name: "Workshops", href: "/workshop" },
+    { name: "Contact", href: "/contact" },
+    { name: "Subsidiaries", href: "/subsidiaries" },
   ],
   support: [
-    { name: 'Login', href: '/login' },
-    { name: 'Sign Up', href: '/signup' },
-    { name: 'Dashboard', href: '/dashboard' },
+    { name: "Login", href: "/login" },
+    { name: "Sign Up", href: "/signup" },
+    { name: "Dashboard", href: "/dashboard" },
     //{ name: 'Application', href: '/application' },
   ],
   social: [
     {
-      name: 'Facebook',
-      href: 'https://www.facebook.com/share/1AEbyXrDdh/',
+      name: "Facebook",
+      href: "https://www.facebook.com/share/1AEbyXrDdh/",
       icon: (props) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path
@@ -39,19 +39,17 @@ const navigation = {
       ),
     },
     {
-      name: 'LinkedIn',
-      href: 'https://www.linkedin.com/company/gamage-recruiters/',
+      name: "LinkedIn",
+      href: "https://www.linkedin.com/company/gamage-recruiters/",
       icon: (props) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
-          <path
-            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
-          />
+          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
         </svg>
       ),
     },
     {
-      name: 'X',
-      href: 'https://x.com/GamageRecru?t=zaNDJqpjWEwAKXYbIM7xIg&s=09',
+      name: "X",
+      href: "https://x.com/GamageRecru?t=zaNDJqpjWEwAKXYbIM7xIg&s=09",
       icon: (props) => (
         <svg
           className="h-6 w-6 text-white hover:text-gray-400 transition-colors duration-300"
@@ -59,15 +57,17 @@ const navigation = {
           fill="currentColor"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path d="M14.095479,10.316482L22.286354,1h-1.940718l-7.115352,8.087682L7.551414,1H1l8.589488,12.231093L1,23h1.940717
+          <path
+            d="M14.095479,10.316482L22.286354,1h-1.940718l-7.115352,8.087682L7.551414,1H1l8.589488,12.231093L1,23h1.940717
 l7.509372-8.542861L16.448587,23H23L14.095479,10.316482z M11.436522,13.338465l-0.871624-1.218704l-6.924311-9.68815h2.981339
-l5.58978,7.82155l0.867949,1.218704l7.26506,10.166271h-2.981339L11.436522,13.338465z" />
+l5.58978,7.82155l0.867949,1.218704l7.26506,10.166271h-2.981339L11.436522,13.338465z"
+          />
         </svg>
       ),
     },
     {
-      name: 'Instagram',
-      href: 'https://www.instagram.com/gamage__recruiters/',
+      name: "Instagram",
+      href: "https://www.instagram.com/gamage__recruiters/",
       icon: (props) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path
@@ -82,47 +82,53 @@ l5.58978,7.82155l0.867949,1.218704l7.26506,10.166271h-2.981339L11.436522,13.3384
 };
 
 export default function Footer() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email) {
-      toast.error('Please enter your email');
+      toast.error("Please enter your email");
       return;
     }
 
     if (!verifyEmail(email)) {
-      toast.error('Please enter a valid email address');
+      toast.error("Please enter a valid email address");
       return;
     }
 
     try {
-      const subscribeToNewsLetterResponse = await axios.post(`${baseURL}/user/subscribe-newsletter`, { email: email }, {withCredentials: true});
+      const subscribeToNewsLetterResponse = await axios.post(
+        `${baseURL}/user/subscribe-newsletter`,
+        { email: email },
+        { withCredentials: true }
+      );
       // console.log(subscribeToNewsLetterResponse.data);
-      if (subscribeToNewsLetterResponse.data && 
-        typeof subscribeToNewsLetterResponse.data === 'string' && 
-        subscribeToNewsLetterResponse.data.includes('already')) {
-        toast.info('You are already subscribed to our newsletter');
+      if (
+        subscribeToNewsLetterResponse.data &&
+        typeof subscribeToNewsLetterResponse.data === "string" &&
+        subscribeToNewsLetterResponse.data.includes("already")
+      ) {
+        toast.info("You are already subscribed to our newsletter");
       } else {
-        toast.success('Subscribed to Newsletter Successfully');
+        toast.success("Subscribed to Newsletter Successfully");
       }
-      setEmail('');
-      } catch (error) {
-        console.log(error);
-        // Handle specific error cases
-        if (error.response) {
-          if (error.response.status === 404) {
-            toast.error('Email not registered. Please sign up first.');
-          } else if (error.response.data) {
-            toast.error(error.response.data);
-          } else {
-            toast.error('Subscription failed. Please try again.');
-          }
+      setEmail("");
+    } catch (error) {
+      console.log(error);
+      // Handle specific error cases
+      if (error.response) {
+        if (error.response.status === 404) {
+          toast.error("Email not registered. Please sign up first.");
+        } else if (error.response.data) {
+          toast.error(error.response.data);
         } else {
-          toast.error('Connection error. Please try again later.');
+          toast.error("Subscription failed. Please try again.");
         }
+      } else {
+        toast.error("Connection error. Please try again later.");
       }
-  }
+    }
+  };
 
   return (
     <footer className="bg-gradient-to-r from-blue-900 to-indigo-900">
@@ -131,22 +137,44 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Company Info */}
           <div>
-            <h3 className="text-lg font-semibold text-white">Gamage Recruiters</h3>
+            <h3 className="text-lg font-semibold text-white">
+              Gamage Recruiters
+            </h3>
             <address className="mt-4 not-italic text-gray-300 space-y-2">
               <p>Panadura, Western Province</p>
               <p>Sri Lanka</p>
               <div className="flex items-center mt-3">
-                <svg className="h-5 w-5 text-blue-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                <svg
+                  className="h-5 w-5 text-blue-400 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
                 </svg>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
                   <span>077 479 5371</span>
                   <span>077 789 7901</span>
                 </div>
               </div>
               <div className="flex items-center">
-                <svg className="h-5 w-5 text-blue-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="h-5 w-5 text-blue-400 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
                 <div className="flex flex-col">
                   <span>hr.gamagecareer@gmail.com</span>
@@ -154,10 +182,20 @@ export default function Footer() {
                 </div>
               </div>
               <div className="flex items-center">
-                <svg className="h-5 w-5 text-blue-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                </svg>
-                <span>gamagerecruiters.com</span>
+                {/* <svg
+                  className="h-5 w-5 text-blue-400 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                  />
+                </svg> */}
+                {/* <span>gamagerecruiters.com</span> */}
               </div>
             </address>
           </div>
@@ -169,7 +207,10 @@ export default function Footer() {
               <ul className="mt-4 space-y-2">
                 {navigation.main.map((item) => (
                   <li key={item.name}>
-                    <Link to={item.href} className="text-gray-300 hover:text-white transition-colors">
+                    <Link
+                      to={item.href}
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
                       {item.name}
                     </Link>
                   </li>
@@ -181,7 +222,10 @@ export default function Footer() {
               <ul className="mt-4 space-y-2">
                 {navigation.support.map((item) => (
                   <li key={item.name}>
-                    <Link to={item.href} className="text-gray-300 hover:text-white transition-colors">
+                    <Link
+                      to={item.href}
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
                       {item.name}
                     </Link>
                   </li>
@@ -193,7 +237,9 @@ export default function Footer() {
           {/* Newsletter */}
           <div>
             <h3 className="text-lg font-semibold text-white">Stay Updated</h3>
-            <p className="mt-4 text-gray-300">Subscribe to our newsletter for job alerts and career tips.</p>
+            <p className="mt-4 text-gray-300">
+              Subscribe to our newsletter for job alerts and career tips.
+            </p>
             <form className="mt-4" onSubmit={handleSubscribe}>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
@@ -218,14 +264,20 @@ export default function Footer() {
         <div className="mt-12 border-t border-blue-800/50 pt-8">
           <div className="flex justify-center space-x-6">
             {navigation.social.map((item) => (
-              <a key={item.name} href={item.href} target='_blank' className="text-gray-300 hover:text-white">
+              <a
+                key={item.name}
+                href={item.href}
+                target="_blank"
+                className="text-gray-300 hover:text-white"
+              >
                 <span className="sr-only">{item.name}</span>
                 <item.icon className="h-6 w-6" aria-hidden="true" />
               </a>
             ))}
           </div>
           <p className="mt-8 text-center text-gray-300 text-sm">
-            &copy; {new Date().getFullYear()} Gamage Recruiters. All rights reserved.
+            &copy; {new Date().getFullYear()} Gamage Recruiters. All rights
+            reserved.
           </p>
         </div>
       </div>
