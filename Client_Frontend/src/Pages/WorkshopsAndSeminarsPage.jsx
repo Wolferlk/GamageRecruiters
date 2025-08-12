@@ -164,9 +164,7 @@ const WorkshopsAndSeminarsPage = () => {
               Workshops & Seminars
             </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto mb-8 animate-fade-in-up animation-delay-200">
-            Expand your horizons, enhance your skills, and connect with industry leaders
-          </p>
+          
           <div className="flex space-x-4 animate-fade-in-up animation-delay-400">
             <button 
               onClick={() => document.getElementById('featured').scrollIntoView({ behavior: 'smooth' })}
