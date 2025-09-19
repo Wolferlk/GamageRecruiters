@@ -193,6 +193,7 @@ function About() {
               <video
                 className="w-full h-full object-cover"
                 controls
+                autoPlay
                 preload="metadata"
                 disablePictureInPicture
                 muted
